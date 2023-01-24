@@ -1,0 +1,2 @@
+This directory should hold all of the sounds the game needs.
+
