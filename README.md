@@ -1,12 +1,18 @@
 # game-jam
 MCC INFO1325-WI Game Jam entry
 
-Team Pitch:
 
-Team Charter:
+### Team Pitch
+<!-- Thpe here -->
 
-Team Board:
+### Team Charter
 
-Work Breakdown:
 
-Schedule:
+### Team Board
+
+
+### Work Breakdown
+
+
+### Schedule
+
