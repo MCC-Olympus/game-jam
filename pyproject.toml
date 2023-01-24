@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "game-jam"
+version = "0.1.0"
+description = "An MCC 1325 Game Jam entry"
+authors = ["Ben Grelk"]
+license = "mit"
+readme = "README.md"
+packages = [{include = "game_jam"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pygame = "^2.1.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.12.0"
+loguru = "^0.6.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
