@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Report an issue you found in the existing code.
-title: "[Bug]: "
+title: "[BUG]: "
 labels: bug
 assignees: ''
 
