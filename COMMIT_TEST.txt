@@ -1,0 +1,9 @@
+To make sure that everyone knows how to navigate GitHub and this project, I think it would be good for everyone to
+practice submitting code by updating this file. You should clone this repository, checkout the dev branch, add your
+name to the bottom of this file, commit the changes, and push to origin/dev. After, I will merge the changes from dev
+into main after I check that nothing is broken.
+
+Also, make sure you can run game_jam/main.py
+
+Add your name here:
+Ben
