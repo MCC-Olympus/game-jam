@@ -7,3 +7,4 @@ Also, make sure you can run game_jam/main.py
 
 Add your name here:
 Ben
+Samuel Blackburn
