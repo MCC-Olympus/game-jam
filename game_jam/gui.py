@@ -3,6 +3,9 @@ from pathlib import Path
 
 import pygame
 
+
+NAME = "JellySmash"
+
 FPS = 60
 ROOT_PATH = Path(__file__).parent.parent
 SPRITE_PATH = ROOT_PATH / "assets/sprites"
@@ -23,7 +26,7 @@ class Window:
             (WIDTH, HEIGHT),
         )
 
-        pygame.display.set_caption("Jelly Jam")
+        pygame.display.set_caption(NAME)
 
         self.clock = pygame.time.Clock()
 
