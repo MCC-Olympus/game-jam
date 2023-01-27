@@ -1,4 +1,7 @@
-import pygame
+import gui
+
 
 if __name__ == "__main__":
-    print("You're all set!")
+    menu = gui.Menu()
+
+    menu.start_loop()
