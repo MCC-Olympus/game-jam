@@ -1,4 +1,9 @@
-import pygame
+import gui
+
 
 if __name__ == "__main__":
-    print("You're all set!")
+    print("Welcome to JellySmash!")
+
+    menu = gui.Menu()
+
+    menu.start_loop()
