@@ -102,23 +102,19 @@ class Element:
         )
 
 
-class Button(Element):
-    """A type of UI element that has text as well as click event handling."""
+class Text(Element):
+    """Display text to the window."""
 
     def __init__(
-        self,
-        prompt: str,
+        self, message: str,
         position: tuple[int, int, int, int],
-        border_radius=50,
-        font_size=30,
-        on_update=lambda element: None,
-        on_click=lambda element: None
+        border_radius=50, font_size=30,
+        on_update=lambda element: None
     ):
-        super().__init__(position, border_radius, on_update=on_update)
-        self._message = prompt
+        super().__init__(position, border_radius, on_update)
+        self._message = message
         self._border_radius = border_radius
         self._font_size = font_size
-        self.on_click = on_click
 
     def show(self):
         pygame.draw.rect(
@@ -131,3 +127,19 @@ class Button(Element):
         text_rect = text.get_rect()
         text_rect.center = self.center
         SCREEN.blit(text, text_rect)
+
+
+class Button(Text):
+    """A type of UI element that has text as well as click event handling."""
+
+    def __init__(
+        self,
+        prompt: str,
+        position: tuple[int, int, int, int],
+        border_radius=50,
+        font_size=30,
+        on_update=lambda element: None,
+        on_click=lambda element: None
+    ):
+        super().__init__(prompt, position, border_radius, font_size, on_update)
+        self.on_click = on_click
