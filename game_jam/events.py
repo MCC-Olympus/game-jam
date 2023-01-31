@@ -61,4 +61,4 @@ def to_menu(window: Window):
 def update_volume(window: Window):
     """Updates the text of the message button."""
 
-    window.elements["sound"].message = f"Sound: {Defaults.volume * 100:.0f}"
+    window.elements["sound"]._message = f"Sound: {Defaults.volume * 100:.0f}"
