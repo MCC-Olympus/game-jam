@@ -3,8 +3,8 @@
 import sys
 import time
 from pathlib import Path
-from types import FunctionType
 from time import perf_counter
+from types import FunctionType
 
 import pygame
 
@@ -22,6 +22,8 @@ SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.HWSURFACE)
 
 # Type hints
 Cordinate = tuple[int, int]
+RGB = tuple[int, int, int]
+Rect = tuple[int, int, int, int]
 
 
 class Window:
@@ -90,7 +92,7 @@ class Element:
 
     def __init__(
         self,
-        position: tuple[int, int, int, int],
+        position: Rect,
         border_radius=50,
         on_update: FunctionType = None
     ):
@@ -127,12 +129,14 @@ class Text(Element):
 
     def __init__(
         self, message: str,
-        position: tuple[int, int, int, int],
+        position: Rect,
+        color: RGB = (0, 0, 0),
         border_radius=50, font_size=30,
         on_update: FunctionType = None
     ):
         super().__init__(position, border_radius, on_update)
         self.message = message
+        self.color = color
         self._border_radius = border_radius
         self._font_size = font_size
 
@@ -142,7 +146,7 @@ class Text(Element):
         )
         font = pygame.font.get_default_font()
         text = pygame.font.Font(font, self._font_size).render(
-            self.message, True, (0, 0, 0)
+            self.message, True, self.color
         )
         text_rect = text.get_rect()
         text_rect.center = self.center
@@ -155,16 +159,19 @@ class TextButton(Text):
     def __init__(
         self,
         message: str,
-        position: tuple[int, int, int, int],
-        border_radius=50, font_size=30,
+        position: Rect,
+        color: RGB = (0, 0, 0),
+        border_radius=50,
+        font_size=30,
         on_update: FunctionType = None,
         on_click: FunctionType = None
     ):
-        super().__init__(message, position, border_radius, font_size, on_update)
+        super().__init__(message, position, color, border_radius, font_size, on_update)
         if on_click is not None:
             self.on_click = on_click
 
-    def on_click(self):
+    @staticmethod
+    def on_click(window: Window):
         """Called whenever the button is pressed"""
 
 
@@ -174,7 +181,7 @@ class Button(Element):
     def __init__(
         self,
         path: Path,
-        position: Cordinate,
+        top_left: Cordinate,
         border_radius=50,
         angle=0,
         on_update: FunctionType = None,
@@ -182,7 +189,7 @@ class Button(Element):
     ):
         self._sprite = pygame.image.load(path)
         self.angle = angle
-        super().__init__(self._sprite.get_rect().move(position), border_radius, on_update)
+        super().__init__(self._sprite.get_rect().move(top_left), border_radius, on_update)
         if on_click is not None:
             self.on_click = on_click
 

@@ -20,6 +20,7 @@ def open_settings(window: Window):
     """Close the current window and open the settings menu."""
 
     window.close()
+    pygame.time.wait(200)
 
     from windows import settings
 
@@ -51,6 +52,7 @@ def to_menu(window: Window):
     """Close the current window and open the main menu."""
 
     window.close()
+    pygame.time.wait(200)
 
     from windows import menu
 
