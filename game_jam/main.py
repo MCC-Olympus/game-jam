@@ -1,5 +1,5 @@
 """The entry point of the game."""
-
+from events import *
 from gui import *
 
 
@@ -20,7 +20,7 @@ my_window = Window(caption="Demo")
 my_window.elements = {
     "title": Text("Demo of UI", (WIDTH // 2, HEIGHT // 3, 0, 0), font_size=50, color=(255, 0, 0)),
     # Add a button called "test" to the window
-    "spinning jar": Button(SPRITE_PATH / "purpleJar.png", (WIDTH // 2, HEIGHT // 2,), on_click=say_hi, on_update=rotate)
+    "spinning jar": Button(SPRITE_PATH / "purpleJar.png", (WIDTH // 2, HEIGHT // 2,), on_click=to_menu, on_update=rotate)
 }
 
 my_window.open()

@@ -26,6 +26,13 @@ def open_settings(window: Window):
 
     settings.open()
 
+def open_level_select(window: Window):
+    window.close()
+    pygame.time.wait(200)
+
+    from windows import level_select
+
+    level_select.open()
 
 def increase_volume(window: Window):
     """Increase the volume by 0.1, if possible."""

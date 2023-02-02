@@ -184,10 +184,15 @@ class Button(Element):
         top_left: Cordinate,
         border_radius=50,
         angle=0,
+        scale=4,
         on_update: FunctionType = None,
         on_click: FunctionType = None
     ):
         self._sprite = pygame.image.load(path)
+        original_width, original_height = self._sprite.get_size()
+        scaled_width = original_width * scale
+        scaled_height = original_height * scale
+        self._sprite = pygame.transform.scale(self._sprite, (scaled_width, scaled_height))
         self.angle = angle
         super().__init__(self._sprite.get_rect().move(top_left), border_radius, on_update)
         if on_click is not None:
