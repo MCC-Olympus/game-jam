@@ -1,26 +1,32 @@
 """The entry point of the game."""
-from events import *
+
+# Demo functionality
 from gui import *
+from audio_processing import get_each_note, play
+from threading import Thread
 
 
-# This is demo code that shows how to use the classes and functions to create a GUI window
-
-def say_hi(window: Window):
-    """Shows this every time the jar is clicked."""
-    print("hi :D")
-
-
-def rotate(window: Window):
-    """Does this every frame"""
-    window.get_element("spinning jar").angle += 1
+def play_next_note(window):
+    # play it in new thread
+    button = window.get_element("play button")
+    if button.times:
+        Thread(
+            target=play, args=(button.file, button.times.pop(0), button.times[0])
+        ).start()
 
 
-# Create instance of the window class
-my_window = Window(caption="Demo")
+my_window = Window()
 my_window.elements = {
-    "title": Text("Demo of UI", (WIDTH // 2, HEIGHT // 3, 0, 0), font_size=50, color=(255, 0, 0)),
-    # Add a button called "test" to the window
-    "spinning jar": Button(SPRITE_PATH / "purpleJar.png", (WIDTH // 2, HEIGHT // 2,), on_click=to_menu, on_update=rotate)
+    "play button": Button(
+        SPRITE_PATH / "purpleJar.png",
+        (WIDTH // 2, HEIGHT // 2),
+        on_click=play_next_note,
+    )
 }
+
+button = my_window.get_element("play button")
+button.file = "../assets/sounds/ode-to-joy.wav"
+button.times = list(get_each_note(button.file))
+
 
 my_window.open()
