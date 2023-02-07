@@ -29,7 +29,7 @@ Rect = tuple[int, int, int, int]
 class Window:
     """Base class for creating all GUI windows."""
 
-    def __init__(self, caption: str = NAME):
+    def __init__(self, caption: str = NAME, background=SPRITE_PATH / "JellyJam.png"):
         """
         :param caption: Sets the title for the window
         """
@@ -37,7 +37,7 @@ class Window:
         pygame.display.set_caption(caption)
 
         self._background = pygame.transform.scale(
-            pygame.image.load(SPRITE_PATH / "JellyJam.png").convert(),
+            pygame.image.load(background).convert(),
             (WIDTH, HEIGHT),
         )
         self._clock = pygame.time.Clock()
