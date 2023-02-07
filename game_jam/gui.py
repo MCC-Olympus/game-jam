@@ -29,16 +29,13 @@ Rect = tuple[int, int, int, int]
 class Window:
     """Base class for creating all GUI windows."""
 
-    def __init__(self, caption: str = NAME, on_update: FunctionType = None):
+    def __init__(self, caption: str = NAME):
         """
         :param caption: Sets the title for the window
-        :param on_update: Function that is called each frame
         """
 
         pygame.display.set_caption(caption)
 
-        if on_update is not None:
-            self._on_update = on_update
         self._background = pygame.transform.scale(
             pygame.image.load(SPRITE_PATH / "JellyJam.png").convert(),
             (WIDTH, HEIGHT),
@@ -117,7 +114,6 @@ class Element:
             self.on_update = on_update
         self.position = position
         self._rect = pygame.Rect(position)
-        self.center = self._rect.center
         self._border_radius = border_radius
 
     def show(self):
@@ -125,6 +121,10 @@ class Element:
         pygame.draw.rect(
             SCREEN, (140, 140, 140), self._rect, border_radius=self._border_radius
         )
+
+    def move(self, x: int, y: int):
+        """Move the element by the specified amount."""
+        self._rect.move_ip(x, y)
 
     @property
     def is_pressed(self):
@@ -135,6 +135,15 @@ class Element:
 
     def on_click(self):
         """Called when an element is clicked on"""
+
+    def move_down(self, y: int):
+        """Move the element down by the specified amount."""
+        self.move(0, y)
+
+    @property
+    def center(self):
+        """The center of the element."""
+        return self._rect.center
 
     @staticmethod
     def on_update(window: Window):
@@ -237,7 +246,9 @@ class Button(Element):
         original_width, original_height = self._sprite.get_size()
         scaled_width = original_width * scale
         scaled_height = original_height * scale
-        self._sprite = pygame.transform.scale(self._sprite, (scaled_width, scaled_height))
+        self._sprite = pygame.transform.scale(
+            self._sprite, (scaled_width, scaled_height)
+        )
         self.angle = angle
         super().__init__(
             self._sprite.get_rect().move(top_left), border_radius, on_update

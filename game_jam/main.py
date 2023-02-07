@@ -1,32 +1,20 @@
 """The entry point of the game."""
 
-# Demo functionality
-from gui import *
-from audio_processing import get_each_note, play
-from threading import Thread
+from pathlib import Path
+
+from gameplay import Level
+from gui import Button
 
 
-def play_next_note(window):
-    # play it in new thread
-    button = window.get_element("play button")
-    if button.times:
-        Thread(
-            target=play, args=(button.file, button.times.pop(0), button.times[0])
-        ).start()
+def smash_jar(level: Level):
+    del level.jars[0]
+    print("smashing jar...")
 
 
-my_window = Window()
-my_window.elements = {
-    "play button": Button(
-        SPRITE_PATH / "purpleJar.png",
-        (WIDTH // 2, HEIGHT // 2),
-        on_click=play_next_note,
-    )
-}
+image = Path("../assets/sprites/magentaJar.png")
+song = Path("../assets/sounds/ode-to-joy.wav")
 
-button = my_window.get_element("play button")
-button.file = "../assets/sounds/ode-to-joy.wav"
-button.times = list(get_each_note(button.file))
+game = Level("Game Jam", song)
+game.jars = [Button(image, (500, 200), on_click=smash_jar)]
 
-
-my_window.open()
+game.open()
