@@ -1,7 +1,6 @@
 """Handles all the processing of audio."""
 
 import librosa
-import numpy as np
 
 
 def get_each_note(path):
