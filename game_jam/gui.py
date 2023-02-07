@@ -21,7 +21,7 @@ HEIGHT = pygame.display.Info().current_h
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.HWSURFACE)
 
 # Type hints
-Cordinate = tuple[int, int]
+Coordinate = tuple[int, int]
 RGB = tuple[int, int, int]
 Rect = tuple[int, int, int, int]
 
@@ -29,7 +29,11 @@ Rect = tuple[int, int, int, int]
 class Window:
     """Base class for creating all GUI windows."""
 
-    def __init__(self, caption: str = NAME, on_update=lambda: None):
+    def __init__(self, caption: str = NAME):
+        """
+        :param caption: Sets the title for the window
+        """
+
         pygame.display.set_caption(caption)
 
         self._background = pygame.transform.scale(
@@ -38,7 +42,6 @@ class Window:
         )
         self._clock = pygame.time.Clock()
         self._running = False
-        self._on_update = on_update
         self._last_click = None
 
         self.elements: dict[Element] = {}
@@ -83,24 +86,34 @@ class Window:
         """Stop the window.."""
         self._running = False
 
-    def get_element(self, name: str) -> 'Element':
+    def get_element(self, name: str) -> "Element":
+        """
+        Returns the specified Element object.
+
+        :param name: The name of the UI element to retrieve
+        """
         return self.elements[name]
+
+    def _on_update(self):
+        """Can be redefined, called each frame."""
 
 
 class Element:
     """The base UI object from which all others are made from."""
 
     def __init__(
-        self,
-        position: Rect,
-        border_radius=50,
-        on_update: FunctionType = None
+        self, position: Rect, border_radius=50, on_update: FunctionType = None
     ):
+        """
+        :param position: The and y of the top left and the width and height
+        :param border_radius: How rounded the edges of the element are
+        :param on_update: A function called each frame
+        """
+
         if on_update is not None:
             self.on_update = on_update
         self.position = position
         self._rect = pygame.Rect(position)
-        self.center = self._rect.center
         self._border_radius = border_radius
 
     def show(self):
@@ -108,6 +121,10 @@ class Element:
         pygame.draw.rect(
             SCREEN, (140, 140, 140), self._rect, border_radius=self._border_radius
         )
+
+    def move(self, x: int, y: int):
+        """Move the element by the specified amount."""
+        self._rect.move_ip(x, y)
 
     @property
     def is_pressed(self):
@@ -119,6 +136,15 @@ class Element:
     def on_click(self):
         """Called when an element is clicked on"""
 
+    def move_down(self, y: int):
+        """Move the element down by the specified amount."""
+        self.move(0, y)
+
+    @property
+    def center(self):
+        """The center of the element."""
+        return self._rect.center
+
     @staticmethod
     def on_update(window: Window):
         """Called every frame."""
@@ -128,12 +154,22 @@ class Text(Element):
     """Display text to the window."""
 
     def __init__(
-        self, message: str,
+        self,
+        message: str,
         position: Rect,
         color: RGB = (0, 0, 0),
-        border_radius=50, font_size=30,
-        on_update: FunctionType = None
+        border_radius=50,
+        font_size=30,
+        on_update: FunctionType = None,
     ):
+        """
+        :param message: The words that the element will show
+        :param position: The left, top, width, and height of the object
+        :param color: The RGB value of the text
+        :param border_radius: How rounded the edges are
+        :param on_update: A function called each frame
+        """
+
         super().__init__(position, border_radius, on_update)
         self.message = message
         self.color = color
@@ -164,8 +200,17 @@ class TextButton(Text):
         border_radius=50,
         font_size=30,
         on_update: FunctionType = None,
-        on_click: FunctionType = None
+        on_click: FunctionType = None,
     ):
+        """
+        :param message: The words that the element will show
+        :param position: The left, top, width, and height of the object
+        :param color: The RGB value of the text
+        :param border_radius: How rounded the edges are
+        :param on_update: A function called each frame
+        :param on_click: A function called each time the element is clicked on
+        """
+
         super().__init__(message, position, color, border_radius, font_size, on_update)
         if on_click is not None:
             self.on_click = on_click
@@ -181,15 +226,33 @@ class Button(Element):
     def __init__(
         self,
         path: Path,
-        top_left: Cordinate,
+        top_left: Coordinate,
         border_radius=50,
         angle=0,
+        scale=4,
         on_update: FunctionType = None,
-        on_click: FunctionType = None
+        on_click: FunctionType = None,
     ):
+        """
+        :param path: The file path to the image of the button
+        :param top_left: The coordinate of the top left of the element
+        :param border_radius: How rounded the edges are
+        :param angle: The counterclockwise rotation of the image, in degrees
+        :param on_update: A function called each frame
+        :param on_click: A function called each time the button is pressed
+        """
+
         self._sprite = pygame.image.load(path)
+        original_width, original_height = self._sprite.get_size()
+        scaled_width = original_width * scale
+        scaled_height = original_height * scale
+        self._sprite = pygame.transform.scale(
+            self._sprite, (scaled_width, scaled_height)
+        )
         self.angle = angle
-        super().__init__(self._sprite.get_rect().move(top_left), border_radius, on_update)
+        super().__init__(
+            self._sprite.get_rect().move(top_left), border_radius, on_update
+        )
         if on_click is not None:
             self.on_click = on_click
 

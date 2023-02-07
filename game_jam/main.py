@@ -1,26 +1,20 @@
 """The entry point of the game."""
 
-from gui import *
+from pathlib import Path
+
+from gameplay import Level
+from gui import Button
 
 
-# This is demo code that shows how to use the classes and functions to create a GUI window
-
-def say_hi(window: Window):
-    """Shows this every time the jar is clicked."""
-    print("hi :D")
+def smash_jar(level: Level):
+    del level.jars[0]
+    print("smashing jar...")
 
 
-def rotate(window: Window):
-    """Does this every frame"""
-    window.get_element("spinning jar").angle += 1
+image = Path("../assets/sprites/magentaJar.png")
+song = Path("../assets/sounds/ode-to-joy.wav")
 
+game = Level("Game Jam", song)
+game.jars = [Button(image, (500, 200), on_click=smash_jar)]
 
-# Create instance of the window class
-my_window = Window(caption="Demo")
-my_window.elements = {
-    "title": Text("Demo of UI", (WIDTH // 2, HEIGHT // 3, 0, 0), font_size=50, color=(255, 0, 0)),
-    # Add a button called "test" to the window
-    "spinning jar": Button(SPRITE_PATH / "purpleJar.png", (WIDTH // 2, HEIGHT // 2,), on_click=say_hi, on_update=rotate)
-}
-
-my_window.open()
+game.open()
