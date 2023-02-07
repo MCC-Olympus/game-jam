@@ -20,11 +20,19 @@ def open_settings(window: Window):
     """Close the current window and open the settings menu."""
 
     window.close()
+    pygame.time.wait(200)
 
     from windows import settings
 
     settings.open()
 
+def open_level_select(window: Window):
+    window.close()
+    pygame.time.wait(200)
+
+    from windows import level_select
+
+    level_select.open()
 
 def increase_volume(window: Window):
     """Increase the volume by 0.1, if possible."""
@@ -61,4 +69,4 @@ def to_menu(window: Window):
 def update_volume(window: Window):
     """Updates the text of the message button."""
 
-    window.elements["sound"]._message = f"Sound: {Defaults.volume * 100:.0f}"
+    window.get_element("sound").message = f"Sound: {Defaults.volume * 100:.0f}"
