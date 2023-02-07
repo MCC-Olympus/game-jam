@@ -11,8 +11,12 @@ def smash_jar(level: Level):
     print("smashing jar...")
 
 
-image = Path("../assets/sprites/magentaJar.png")
-song = Path("../assets/sounds/ode-to-joy.wav")
+ASSETS = Path(__file__).parent.parent / "assets"
+SPRITES = ASSETS / "sprites"
+SOUNDS = ASSETS / "sounds"
+
+image = SPRITES / "magentaJar.png"
+song = SOUNDS / "ode-to-joy.wav"
 
 game = Level("Game Jam", song)
 game.jars = [Button(image, (500, 200), on_click=smash_jar)]
