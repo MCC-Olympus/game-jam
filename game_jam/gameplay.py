@@ -5,13 +5,13 @@ import threading
 import time
 from pathlib import Path
 from time import perf_counter
-
+import windows
 import pygame
 
 import audio_processing
 import gui
 
-
+WIDTH = pygame.display.Info().current_w
 class Level(gui.Window):
     """The class for making individual levels."""
 
@@ -52,12 +52,15 @@ class Level(gui.Window):
             if jar.center[1] > self.HEIGHT:
                 print("Game over")
                 self._running = False
+                windows.level_one.close()
                 self.close()
 
     def _display_elements(self):
         """Display each element every frame."""
         Level.SCREEN.blit(self._background, (0, 0))
         for element in self.elements.values():
+            element.show()
+        for element in windows.level_one.elements.values():
             element.show()
         for jar in self.jars:
             jar.show()
@@ -71,11 +74,11 @@ class Level(gui.Window):
     def spawn_jars(self):
         """Generate the next jar in a random position in sync with the song."""
         while self._running:
-            x = random.randint(0, self.HEIGHT - 100)
+            x = random.randint(0, 4)
             sprite = (
                 Path(__file__).parent.parent / "assets" / "sprites" / "magentaJar.png"
             )
-            self.jars.append(gui.Button(sprite, (x, 0)))
+            self.jars.append(gui.Button(sprite, ((30+(x*9))*WIDTH // 103, 0)))
 
             sleep_amount = self.timestamps[1] - self.timestamps[0]
             time.sleep(sleep_amount)

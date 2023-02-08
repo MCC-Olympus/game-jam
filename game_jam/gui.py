@@ -25,11 +25,17 @@ Coordinate = tuple[int, int]
 RGB = tuple[int, int, int]
 Rect = tuple[int, int, int, int]
 
+def get_sprite_height(sprite="belt.png"):
+    sprite_image = pygame.image.load(SPRITE_PATH/sprite)
+    sprite = pygame.sprite.Sprite()
+    sprite.image = sprite_image
+    sprite.rect = sprite.image.get_rect()
+    return sprite.rect.height
 
 class Window:
     """Base class for creating all GUI windows."""
 
-    def __init__(self, caption: str = NAME, background=SPRITE_PATH / "JellyJam.png"):
+    def __init__(self, caption: str = NAME, background=SPRITE_PATH / "background (1).jpg"):
         """
         :param caption: Sets the title for the window
         """
@@ -229,7 +235,7 @@ class Button(Element):
         top_left: Coordinate,
         border_radius=50,
         angle=0,
-        scale=4,
+        scale=2.5,
         on_update: FunctionType = None,
         on_click: FunctionType = None,
     ):
@@ -244,8 +250,8 @@ class Button(Element):
 
         self._sprite = pygame.image.load(path)
         original_width, original_height = self._sprite.get_size()
-        scaled_width = original_width * scale
-        scaled_height = original_height * scale
+        scaled_width = int(original_width * scale)
+        scaled_height = int(original_height * scale)
         self._sprite = pygame.transform.scale(
             self._sprite, (scaled_width, scaled_height)
         )

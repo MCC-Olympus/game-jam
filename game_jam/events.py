@@ -1,13 +1,15 @@
 """Events that are triggered for a specific object every frame."""
 
 import sys
-
-from gui import Window
+from gameplay import Level
+from gui import *
 from values import Defaults
 
 import pygame
-
-
+ASSETS = Path(__file__).parent.parent / "assets"
+SPRITES = ASSETS / "sprites"
+SOUNDS = ASSETS / "sounds"
+song = SOUNDS / "ode-to-joy.wav"
 def exit_game(window: Window) -> None:
     """Closes the game and thanks the player."""
 
@@ -70,3 +72,14 @@ def update_volume(window: Window):
     """Updates the text of the message button."""
 
     window.get_element("sound").message = f"Sound: {Defaults.volume * 100:.0f}"
+
+def lvl_load(window: Window):
+    window.close()
+    from windows import level_one
+    level_one.open()
+def lvl_one_run(window: Window):
+    game = Level("Game Jam", song)
+    game.open()
+
+def do_nothing(window: Window):
+    pass
