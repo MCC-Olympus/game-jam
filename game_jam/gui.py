@@ -2,40 +2,33 @@
 
 import sys
 import time
-from pathlib import Path
 from time import perf_counter
 from types import FunctionType
 
+from constants import *
+
 import pygame
-
-NAME = "JellySmash"
-
-FPS = 60
-ROOT_PATH = Path(__file__).parent.parent
-SPRITE_PATH = ROOT_PATH / "assets/sprites"
 
 pygame.init()
 
-WIDTH = pygame.display.Info().current_w
-HEIGHT = pygame.display.Info().current_h
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.HWSURFACE)
-
-# Type hints
-Coordinate = tuple[int, int]
-RGB = tuple[int, int, int]
-Rect = tuple[int, int, int, int]
 
 def get_sprite_height(sprite="belt.png"):
-    sprite_image = pygame.image.load(SPRITE_PATH/sprite)
+    sprite_image = pygame.image.load(SPRITES / sprite)
     sprite = pygame.sprite.Sprite()
     sprite.image = sprite_image
     sprite.rect = sprite.image.get_rect()
     return sprite.rect.height
 
+
 class Window:
     """Base class for creating all GUI windows."""
 
-    def __init__(self, caption: str = NAME, background=SPRITE_PATH / "GameBackground.png",score = 0):
+    def __init__(
+        self,
+        caption: str = NAME,
+        background=SPRITES / "GameBackground.png",
+        score=0,
+    ):
         """
         :param caption: Sets the title for the window
         """
@@ -187,7 +180,9 @@ class Text(Element):
         )
         font = pygame.font.get_default_font()
         text = pygame.font.Font(font, self._font_size).render(
-            str(self.message).encode(encoding = 'UTF-8', errors = 'ignore'), True, self.color
+            str(self.message).encode(encoding="UTF-8", errors="ignore"),
+            True,
+            self.color,
         )
         text_rect = text.get_rect()
         text_rect.center = self.center
