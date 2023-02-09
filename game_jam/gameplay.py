@@ -72,7 +72,7 @@ class Level(gui.Window):
                 if self._last_click is None or perf_counter() - self._last_click > 0.2:
                     self.smash(jar)
                     self._last_click = perf_counter()
-            if jar.center[1] > self.HEIGHT:
+            if jar.center[1] > HEIGHT:
                 self.jars.pop(self.jars.index(jar))
                 color = str(jar.path)
                 del jar
@@ -80,8 +80,6 @@ class Level(gui.Window):
                     pass
                 else:
                     self.lose_life()
-                self.lose_life()
-                self.smash(jar)
 
     def _display_elements(self):
         """Display each element every frame."""
@@ -106,8 +104,8 @@ class Level(gui.Window):
             self.lose_life()
         else:
             self.score +=100
-        self.scoreBoard.message=self.score
-        self.scoreBoard.show()
+        self.score_board.message=self.score
+        self.score_board.show()
         
 
 
