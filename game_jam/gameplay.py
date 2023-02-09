@@ -1,31 +1,18 @@
 """Classes and elements that will appear during the gameplay itself."""
 
 import random
-import sys
 import threading
 import time
-from pathlib import Path
 from time import perf_counter
-import windows
-import pygame
 
 import audio_processing
 import gui
+import windows
+from constants import *
 
-ASSETS = Path(__file__).parent.parent / "assets"
-SPRITES = ASSETS / "sprites"
-SOUNDS = ASSETS / "sounds"
-WIDTH = pygame.display.Info().current_w
+
 class Level(gui.Window):
     """The class for making individual levels."""
-    lives = []
-    lives.append(gui.Button(SPRITES/"redHeart.png",(38,65),scale=3))
-    lives.append(gui.Button(SPRITES/"redHeart.png",(147,65),scale=3))
-    lives.append(gui.Button(SPRITES/"redHeart.png",(255,65),scale=3))
-    WIDTH = pygame.display.Info().current_w
-    HEIGHT = pygame.display.Info().current_h
-    SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.HWSURFACE)
-    score = 0
 
     def __init__(self, caption: str, song, speed=5):
         super().__init__(caption)
@@ -33,11 +20,25 @@ class Level(gui.Window):
         self.timestamps = list(audio_processing.get_each_note(song))
         pygame.mixer.music.load(song)
         pygame.mixer.music.play()
+
         self.start = time.perf_counter()
         self.speed = speed
         self.score = 0
-        self.scoreBoard = gui.Text(message=str(self.score),position=(997,201,355,100),border_radius=0,font_size=75)
-        self.scoreBoard.show()
+
+        self.lives = [
+            gui.Button(SPRITES / "redHeart.png", (38, 65), scale=3),
+            gui.Button(SPRITES / "redHeart.png", (147, 65), scale=3),
+            gui.Button(SPRITES / "redHeart.png", (255, 65), scale=3),
+        ]
+        self.score = 0
+
+        self.score_board = gui.Text(
+            message=str(self.score),
+            position=(997, 201, 355, 100),
+            border_radius=0,
+            font_size=75,
+        )
+        self.score_board.show()
         self._running = True
         self._thread = threading.Thread(target=self.spawn_jars)
         self._thread.start()
@@ -49,9 +50,10 @@ class Level(gui.Window):
         else:
             print("Game over")
             self._running = False
+            pygame.mixer.music.stop()
             self.close()
-            pygame.quit()
-            sys.exit()
+            from windows import level_select
+            level_select.open()
 
     def _update_elements(self):
         """Updates each element every frame."""
@@ -78,11 +80,13 @@ class Level(gui.Window):
                     pass
                 else:
                     self.lose_life()
+                self.lose_life()
+                self.smash(jar)
 
     def _display_elements(self):
         """Display each element every frame."""
-        Level.SCREEN.blit(self._background, (0, 0))
-        self.scoreBoard.show()
+        SCREEN.blit(self._background, (0, 0))
+        self.score_board.show()
         for element in self.elements.values():
             element.show()
         for element in windows.level_one.elements.values():
@@ -118,8 +122,8 @@ class Level(gui.Window):
             else: daColor = "purpleJar.png"
             sprite = (
                 SPRITES / daColor
-            ) 
-            self.jars.append(gui.Button(sprite, ((30+(x*9))*WIDTH // 103, 0)))
+            )
+            self.jars.append(gui.Button(sprite, ((30 + (x * 9)) * WIDTH // 103, 0)))
             sleep_amount = self.timestamps[1] - self.timestamps[0]
             time.sleep(sleep_amount)
             self.timestamps.pop()
