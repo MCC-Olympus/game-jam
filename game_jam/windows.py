@@ -16,22 +16,22 @@ def lvl_three_load(window: Window):
     window.close()
     level_three.open()
 
-menu = Window(caption="JellySmash Menu", background=SPRITE_PATH/"JellyJam.png")
+menu = Window(caption="JellySmash Menu", background=SPRITE_PATH/"sbg.png")
 menu.elements = {
-    "open": Button(SPRITE_PATH / "startButton.png",(WIDTH // 2 - 100, 100),scale=2, on_click=open_level_select),
-    "settings": Button(SPRITE_PATH / "settingsButton.png",(WIDTH // 2 - 100, 300),scale=2, on_click=open_settings),
-    "exit": Button(SPRITE_PATH / "exitButton.png",(WIDTH // 2 - 100, 500),scale=2, on_click=exit_game),
+    "open": Button(SPRITE_PATH / "startButton.png",(WIDTH // 2 - 105, 100),scale=2, on_click=open_level_select),
+    "settings": Button(SPRITE_PATH / "settingsButton.png",(WIDTH // 2 - 150, 300),scale=2, on_click=open_settings),
+    "exit": Button(SPRITE_PATH / "exitButton.png",(WIDTH // 2 - 50, 500),scale=2, on_click=exit_game),
 }
-level_select = Window(caption="Level selector")
+level_select = Window(caption="Level selector", background=SPRITE_PATH / "bg.png")
 level_select.elements = {
-    "Level One": Button(SPRITE_PATH / "lvlOneButton.png",(WIDTH // 5 -100, 300),border_radius=0,angle=0,scale=3,on_click=lvl_one_load),
-    "Level Two": Button(SPRITE_PATH / "lvlTwoButton.png",(2*WIDTH // 5 -100, 300),border_radius=0,angle=0,scale=3,on_click=lvl_two_load), 
-    "Level Three": Button(SPRITE_PATH / "lvlThreeButton.png",(3*WIDTH // 5 -100, 300),border_radius=0,angle=0,scale=3,on_click=lvl_three_load),
-    "Endless Mode": Button(SPRITE_PATH / "endlessButton.png",(4*WIDTH // 5 -100, 300),angle=0,scale=3,on_click=to_menu),
-    "Back": Button(SPRITE_PATH / "exitButton.png",(WIDTH // 2 -100, 500),angle=0,scale=3,on_click=to_menu)
+    "Level One": Button(SPRITE_PATH / "lvlOneButton.png",(WIDTH // 5 -100, HEIGHT//4),border_radius=0,angle=0,scale=3,on_click=lvl_one_load),
+    "Level Two": Button(SPRITE_PATH / "lvlTwoButton.png",(2*WIDTH // 5 -100, HEIGHT//4),border_radius=0,angle=0,scale=3,on_click=lvl_two_load), 
+    "Level Three": Button(SPRITE_PATH / "lvlThreeButton.png",(3*WIDTH // 5 -100, HEIGHT//4),border_radius=0,angle=0,scale=3,on_click=lvl_three_load),
+    "Endless Mode": Button(SPRITE_PATH / "endlessButton.png",(4*WIDTH // 5 -100, HEIGHT//4),angle=0,scale=3,on_click=to_menu),
+    "Back": Button(SPRITE_PATH / "exitButton.png",(WIDTH // 2 -100, 2*HEIGHT//4),angle=0,scale=3,on_click=to_menu)
 }
 
-settings = Window(caption="JellySmash Settings", background=SPRITE_PATH/"JellyJam.png")
+settings = Window(caption="JellySmash Settings", background=SPRITE_PATH/"bg.png")
 settings.elements = {
     "increase_sound": TextButton("->", (WIDTH // 2 + 125, 200, 50, 50,), on_click=increase_volume),
     "decrease_sound": TextButton("<-", (WIDTH // 2 - 175, 200, 50, 50), on_click=decrease_volume),

@@ -71,8 +71,13 @@ class Level(gui.Window):
                     self.smash(jar)
                     self._last_click = perf_counter()
             if jar.center[1] > self.HEIGHT:
-                self.lose_life()
-                self.smash(jar)
+                self.jars.pop(self.jars.index(jar))
+                color = str(jar.path)
+                del jar
+                if "pickelJar.png" in color:
+                    pass
+                else:
+                    self.lose_life()
 
     def _display_elements(self):
         """Display each element every frame."""
@@ -91,8 +96,12 @@ class Level(gui.Window):
     def smash(self, jar: gui.Button):
         """Destroys a specified jar"""
         self.jars.pop(self.jars.index(jar))
+        color = str(jar.path)
         del jar
-        self.score +=100
+        if "pickelJar.png" in color:
+            self.lose_life()
+        else:
+            self.score +=100
         self.scoreBoard.message=self.score
         self.scoreBoard.show()
         
@@ -102,8 +111,13 @@ class Level(gui.Window):
         """Generate the next jar in a random position in sync with the song."""
         while self._running:
             x = random.randint(0, 4)
+            z = random.randint(1,100)
+            if z < 11: daColor = "pickelJar.png"
+            elif z < 41: daColor = "redJar.png"
+            elif z < 71: daColor = "magentaJar.png"
+            else: daColor = "purpleJar.png"
             sprite = (
-                Path(__file__).parent.parent / "assets" / "sprites" / "magentaJar.png"
+                SPRITES / daColor
             ) 
             self.jars.append(gui.Button(sprite, ((30+(x*9))*WIDTH // 103, 0)))
             sleep_amount = self.timestamps[1] - self.timestamps[0]

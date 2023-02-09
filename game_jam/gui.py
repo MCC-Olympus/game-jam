@@ -183,7 +183,7 @@ class Text(Element):
 
     def show(self):
         pygame.draw.rect(
-            SCREEN, (140, 140, 140), self._rect, border_radius=self._border_radius
+            SCREEN, (183,101,59), self._rect, border_radius=self._border_radius
         )
         font = pygame.font.get_default_font()
         text = pygame.font.Font(font, self._font_size).render(
@@ -246,7 +246,7 @@ class Button(Element):
         :param on_update: A function called each frame
         :param on_click: A function called each time the button is pressed
         """
-
+        self.path = path
         self._sprite = pygame.image.load(path)
         original_width, original_height = self._sprite.get_size()
         scaled_width = int(original_width * scale)
