@@ -35,13 +35,12 @@ def get_sprite_height(sprite="belt.png"):
 class Window:
     """Base class for creating all GUI windows."""
 
-    def __init__(self, caption: str = NAME, background=SPRITE_PATH / "background (1).jpg"):
+    def __init__(self, caption: str = NAME, background=SPRITE_PATH / "GameBackground.png",score = 0):
         """
         :param caption: Sets the title for the window
         """
-
         pygame.display.set_caption(caption)
-
+        self.score = score
         self._background = pygame.transform.scale(
             pygame.image.load(background).convert(),
             (WIDTH, HEIGHT),
@@ -163,7 +162,7 @@ class Text(Element):
         self,
         message: str,
         position: Rect,
-        color: RGB = (0, 0, 0),
+        color: RGB = (255, 255, 255),
         border_radius=50,
         font_size=30,
         on_update: FunctionType = None,
@@ -188,7 +187,7 @@ class Text(Element):
         )
         font = pygame.font.get_default_font()
         text = pygame.font.Font(font, self._font_size).render(
-            self.message, True, self.color
+            str(self.message).encode(encoding = 'UTF-8', errors = 'ignore'), True, self.color
         )
         text_rect = text.get_rect()
         text_rect.center = self.center
