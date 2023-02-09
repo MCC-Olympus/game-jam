@@ -124,7 +124,7 @@ class Element:
     def show(self):
         """Display an element to the screen"""
         pygame.draw.rect(
-            SCREEN, (140, 140, 140), self._rect, border_radius=self._border_radius
+            SCREEN, (0, 0, 0), self._rect, border_radius=self._border_radius
         )
 
     def move(self, x: int, y: int):

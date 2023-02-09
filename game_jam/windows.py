@@ -51,19 +51,10 @@ level_one.elements = {
 
 level_two = Window("Level Two screen")
 level_two.elements = {
-    "Belt One": Button(SPRITE_PATH / "belt.png",(29*WIDTH // 103 , 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_click=do_nothing),
-    "Belt Two": Button(SPRITE_PATH / "belt.png",(38*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_click=do_nothing),
-    "Belt Three": Button(SPRITE_PATH / "belt.png",(47*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_click=do_nothing),
-    "Belt Four": Button(SPRITE_PATH / "belt.png",(56*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_click=do_nothing),
     "Belt Five": Button(SPRITE_PATH / "belt.png",(65*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_update=lvl_two_run),
-    "ScoreBoard": Text(message=str(level_one.score),position=(500,300,200,100),font_size=75)
 }
 
 level_three = Window("Level Three screen")
 level_three.elements = {
-    "Belt One": Button(SPRITE_PATH / "belt.png",(29*WIDTH // 103 , 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_click=do_nothing),
-    "Belt Two": Button(SPRITE_PATH / "belt.png",(38*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_click=do_nothing),
-    "Belt Three": Button(SPRITE_PATH / "belt.png",(47*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_click=do_nothing),
-    "Belt Four": Button(SPRITE_PATH / "belt.png",(56*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_click=do_nothing),
     "Belt Five": Button(SPRITE_PATH / "belt.png",(65*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_update=lvl_three_run),
 }

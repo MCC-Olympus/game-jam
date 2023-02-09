@@ -36,7 +36,7 @@ class Level(gui.Window):
         self.start = time.perf_counter()
         self.speed = speed
         self.score = 0
-        self.scoreBoard = gui.Text(message=str(self.score),position=(1000,200,200,100),border_radius=10,font_size=75)
+        self.scoreBoard = gui.Text(message=str(self.score),position=(997,201,355,100),border_radius=0,font_size=75)
         self.scoreBoard.show()
         self._running = True
         self._thread = threading.Thread(target=self.spawn_jars)
