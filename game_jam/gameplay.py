@@ -44,6 +44,10 @@ class Level(gui.Window):
         self._thread = threading.Thread(target=self.spawn_jars)
         self._thread.start()
 
+    def close(self):
+        super().close()
+        windows.level_select.open()
+
     def lose_life(self):
         """Remove a heart anytime a jar is lost"""
 
@@ -54,9 +58,6 @@ class Level(gui.Window):
             self._running = False
             pygame.mixer.music.stop()
             self.close()
-            from windows import level_select
-
-            level_select.open()
 
     def _update_elements(self):
         """Updates each element every frame."""
@@ -88,14 +89,13 @@ class Level(gui.Window):
         """Display each element every frame."""
         SCREEN.blit(self._background, (0, 0))
         self.score_board.show()
-        for element in self.elements.values():
+        for element in (
+            list(self.elements.values())
+            + list(windows.level_one.elements.values())
+            + self.jars
+            + self.lives
+        ):
             element.show()
-        for element in windows.level_one.elements.values():
-            element.show()
-        for jar in self.jars:
-            jar.show()
-        for life in self.lives:
-            life.show()
         pygame.display.update()
 
     def smash(self, jar: gui.Button):
@@ -110,18 +110,22 @@ class Level(gui.Window):
     def spawn_jars(self):
         """Generate the next jar in a random position in sync with the song."""
         while self._running:
-            x = random.randint(0, 4)
-            z = random.randint(1, 100)
-            if z < 11:
-                filename = "pickleJar.png"
-            elif z < 41:
-                filename = "redJar.png"
-            elif z < 71:
-                filename = "magentaJar.png"
+            filename = random.choices(
+                # Each color is 3x more likely than a pickle
+                ("pickle", "red", "purple", "magenta"), (1, 3, 3, 3)
+            )[0]
+            self.jars.append(
+                gui.Button(
+                    SPRITES / f"{filename}Jar.png",
+                    ((30 + (random.randint(0, 4) * 9)) * WIDTH // 103, 0),
+                )
+            )
+            notes = len(self.timestamps)
+            if notes >= 2:
+                time.sleep(self.timestamps[1] - self.timestamps[0])
+            elif notes == 1:
+                time.sleep(self.timestamps[0])
             else:
-                filename = "purpleJar.png"
-            sprite = SPRITES / filename
-            self.jars.append(gui.Button(sprite, ((30 + (x * 9)) * WIDTH // 103, 0)))
-            sleep_amount = self.timestamps[1] - self.timestamps[0]
-            time.sleep(sleep_amount)
+                print("You win!")
+                self.close()
             self.timestamps.pop()
