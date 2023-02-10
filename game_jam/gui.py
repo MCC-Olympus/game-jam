@@ -2,42 +2,40 @@
 
 import sys
 import time
-from pathlib import Path
 from time import perf_counter
 from types import FunctionType
 
+from constants import *
+
 import pygame
-
-NAME = "JellySmash"
-
-FPS = 60
-ROOT_PATH = Path(__file__).parent.parent
-SPRITE_PATH = ROOT_PATH / "assets/sprites"
 
 pygame.init()
 
-WIDTH = pygame.display.Info().current_w
-HEIGHT = pygame.display.Info().current_h
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.HWSURFACE)
 
-# Type hints
-Coordinate = tuple[int, int]
-RGB = tuple[int, int, int]
-Rect = tuple[int, int, int, int]
+def get_sprite_height(sprite="belt.png"):
+    sprite_image = pygame.image.load(SPRITES / sprite)
+    sprite = pygame.sprite.Sprite()
+    sprite.image = sprite_image
+    sprite.rect = sprite.image.get_rect()
+    return sprite.rect.height
 
 
 class Window:
     """Base class for creating all GUI windows."""
 
-    def __init__(self, caption: str = NAME):
+    def __init__(
+        self,
+        caption: str = NAME,
+        background=SPRITES / "GameBackground.png",
+        score=0,
+    ):
         """
         :param caption: Sets the title for the window
         """
-
         pygame.display.set_caption(caption)
-
+        self.score = score
         self._background = pygame.transform.scale(
-            pygame.image.load(SPRITE_PATH / "JellyJam.png").convert(),
+            pygame.image.load(background).convert(),
             (WIDTH, HEIGHT),
         )
         self._clock = pygame.time.Clock()
@@ -119,7 +117,7 @@ class Element:
     def show(self):
         """Display an element to the screen"""
         pygame.draw.rect(
-            SCREEN, (140, 140, 140), self._rect, border_radius=self._border_radius
+            SCREEN, (0, 0, 0), self._rect, border_radius=self._border_radius
         )
 
     def move(self, x: int, y: int):
@@ -157,7 +155,7 @@ class Text(Element):
         self,
         message: str,
         position: Rect,
-        color: RGB = (0, 0, 0),
+        color: RGB = (255, 255, 255),
         border_radius=50,
         font_size=30,
         on_update: FunctionType = None,
@@ -178,11 +176,13 @@ class Text(Element):
 
     def show(self):
         pygame.draw.rect(
-            SCREEN, (140, 140, 140), self._rect, border_radius=self._border_radius
+            SCREEN, (183,101,59), self._rect, border_radius=self._border_radius
         )
         font = pygame.font.get_default_font()
         text = pygame.font.Font(font, self._font_size).render(
-            self.message, True, self.color
+            str(self.message).encode(encoding="UTF-8", errors="ignore"),
+            True,
+            self.color,
         )
         text_rect = text.get_rect()
         text_rect.center = self.center
@@ -229,7 +229,7 @@ class Button(Element):
         top_left: Coordinate,
         border_radius=50,
         angle=0,
-        scale=4,
+        scale=2.5,
         on_update: FunctionType = None,
         on_click: FunctionType = None,
     ):
@@ -241,11 +241,11 @@ class Button(Element):
         :param on_update: A function called each frame
         :param on_click: A function called each time the button is pressed
         """
-
+        self.path = path
         self._sprite = pygame.image.load(path)
         original_width, original_height = self._sprite.get_size()
-        scaled_width = original_width * scale
-        scaled_height = original_height * scale
+        scaled_width = int(original_width * scale)
+        scaled_height = int(original_height * scale)
         self._sprite = pygame.transform.scale(
             self._sprite, (scaled_width, scaled_height)
         )
