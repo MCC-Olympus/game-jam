@@ -20,6 +20,7 @@ class Level(gui.Window):
         self.timestamps = list(audio_processing.get_each_note(song))
         pygame.mixer.music.load(song)
         pygame.mixer.music.play()
+        self.smash_sound = SOUNDS / "smashing_glass.wav"
 
         self.start = time.perf_counter()
         self.speed = speed
@@ -45,6 +46,7 @@ class Level(gui.Window):
 
     def lose_life(self):
         """Remove a heart anytime a jar is lost"""
+
         if len(self.lives) > 1:
             self.lives.pop()
         else:
@@ -53,6 +55,7 @@ class Level(gui.Window):
             pygame.mixer.music.stop()
             self.close()
             from windows import level_select
+
             level_select.open()
 
     def _update_elements(self):
@@ -71,14 +74,14 @@ class Level(gui.Window):
             if jar.is_pressed:
                 if self._last_click is None or perf_counter() - self._last_click > 0.2:
                     self.smash(jar)
+                    if "pickle" in str(jar.path):
+                        self.lose_life()
+                    else:
+                        self.score += 100
                     self._last_click = perf_counter()
             if jar.center[1] > HEIGHT:
-                self.jars.pop(self.jars.index(jar))
-                color = str(jar.path)
-                del jar
-                if "pickelJar.png" in color:
-                    pass
-                else:
+                self.smash(jar)
+                if "pickle" not in str(jar.path):
                     self.lose_life()
 
     def _display_elements(self):
@@ -97,30 +100,27 @@ class Level(gui.Window):
 
     def smash(self, jar: gui.Button):
         """Destroys a specified jar"""
-        self.jars.pop(self.jars.index(jar))
-        color = str(jar.path)
-        del jar
-        if "pickelJar.png" in color:
-            self.lose_life()
-        else:
-            self.score +=100
-        self.score_board.message=self.score
-        self.score_board.show()
-        
 
+        pygame.mixer.Sound(self.smash_sound).play()
+        self.jars.pop(self.jars.index(jar))
+        del jar
+        self.score_board.message = self.score
+        self.score_board.show()
 
     def spawn_jars(self):
         """Generate the next jar in a random position in sync with the song."""
         while self._running:
             x = random.randint(0, 4)
-            z = random.randint(1,100)
-            if z < 11: daColor = "pickelJar.png"
-            elif z < 41: daColor = "redJar.png"
-            elif z < 71: daColor = "magentaJar.png"
-            else: daColor = "purpleJar.png"
-            sprite = (
-                SPRITES / daColor
-            )
+            z = random.randint(1, 100)
+            if z < 11:
+                filename = "pickleJar.png"
+            elif z < 41:
+                filename = "redJar.png"
+            elif z < 71:
+                filename = "magentaJar.png"
+            else:
+                filename = "purpleJar.png"
+            sprite = SPRITES / filename
             self.jars.append(gui.Button(sprite, ((30 + (x * 9)) * WIDTH // 103, 0)))
             sleep_amount = self.timestamps[1] - self.timestamps[0]
             time.sleep(sleep_amount)
