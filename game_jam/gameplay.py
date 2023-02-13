@@ -27,15 +27,15 @@ class Level(gui.Window):
         self.score = 0
 
         self.lives = [
-            gui.Button(SPRITES / "redHeart.png", (38, 65), scale=3),
-            gui.Button(SPRITES / "redHeart.png", (147, 65), scale=3),
-            gui.Button(SPRITES / "redHeart.png", (255, 65), scale=3),
+            gui.Button(SPRITES / "redHeart.png", (38*WIDTH // 1336, 65*HEIGHT // 768), scale=3),
+            gui.Button(SPRITES / "redHeart.png", (143*WIDTH // 1336, 65*HEIGHT // 768), scale=3),
+            gui.Button(SPRITES / "redHeart.png", (250*WIDTH // 1336, 65*HEIGHT // 768), scale=3),
         ]
         self.score = 0
 
         self.score_board = gui.Text(
             message=str(self.score),
-            position=(997, 201, 355, 100),
+            position=(997*WIDTH//1366, 201*HEIGHT//768, 355*WIDTH//1366, 100*HEIGHT//768),
             border_radius=0,
             font_size=75,
         )
@@ -45,6 +45,8 @@ class Level(gui.Window):
         self._thread.start()
 
     def close(self):
+        self._running = False
+        pygame.mixer.music.stop()
         super().close()
         windows.level_select.open()
 
