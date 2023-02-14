@@ -113,6 +113,7 @@ class Element:
         self.position = position
         self._rect = pygame.Rect(position)
         self._border_radius = border_radius
+        self.broken = None
 
     def show(self):
         """Display an element to the screen"""
@@ -242,25 +243,29 @@ class Button(Element):
         :param on_click: A function called each time the button is pressed
         """
         self.path = path
-        self._sprite = pygame.image.load(path)
-        original_width, original_height = self._sprite.get_size()
-        scaled_width = int(original_width * scale)
-        scaled_height = int(original_height * scale)
-        self._sprite = pygame.transform.scale(
-            self._sprite, (scaled_width, scaled_height)
-        )
         self.angle = angle
+        self.scale = scale
+        sp = pygame.image.load(path)
+        original_width, original_height = sp.get_size()
+        self._width = int(original_width * self.scale)
+        self._height = int(original_height * self.scale)
         super().__init__(
-            self._sprite.get_rect().move(top_left), border_radius, on_update
+            self.sprite.get_rect().move(top_left), border_radius, on_update
         )
         if on_click is not None:
             self.on_click = on_click
 
     def show(self):
-        image = pygame.transform.rotate(self._sprite, self.angle)
+        image = pygame.transform.rotate(self.sprite, self.angle)
         rect = image.get_rect(center=self.center)
 
         SCREEN.blit(image, rect)
 
     def on_click(self):
         """Called whenever the button is pressed"""
+
+    @property
+    def sprite(self):
+        return pygame.transform.scale(
+            pygame.image.load(self.path), (self._width, self._height)
+        )

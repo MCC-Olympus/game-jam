@@ -27,15 +27,20 @@ class Level(gui.Window):
         self.score = 0
 
         self.lives = [
-            gui.Button(SPRITES / "redHeart.png", (38, 65), scale=3),
-            gui.Button(SPRITES / "redHeart.png", (147, 65), scale=3),
-            gui.Button(SPRITES / "redHeart.png", (255, 65), scale=3),
+            gui.Button(SPRITES / "redHeart.png", (38*WIDTH // 1336, 65*HEIGHT // 768), scale=3),
+            gui.Button(SPRITES / "redHeart.png", (143*WIDTH // 1336, 65*HEIGHT // 768), scale=3),
+            gui.Button(SPRITES / "redHeart.png", (250*WIDTH // 1336, 65*HEIGHT // 768), scale=3),
         ]
         self.score = 0
 
         self.score_board = gui.Text(
             message=str(self.score),
-            position=(997, 201, 355, 100),
+            position=(
+                997 * WIDTH // 1366,
+                201 * HEIGHT // 768,
+                355 * WIDTH // 1366,
+                100 * HEIGHT // 768,
+            ),
             border_radius=0,
             font_size=75,
         )
@@ -45,6 +50,8 @@ class Level(gui.Window):
         self._thread.start()
 
     def close(self):
+        self._running = False
+        pygame.mixer.music.stop()
         super().close()
         windows.level_select.open()
 
@@ -70,7 +77,6 @@ class Level(gui.Window):
 
         for jar in self.jars:
             jar.move_down(self.speed)
-            # Check it's in bounds
             jar.on_update(self)
             if jar.is_pressed:
                 if self._last_click is None or perf_counter() - self._last_click > 0.2:
@@ -80,10 +86,21 @@ class Level(gui.Window):
                     else:
                         self.score += 100
                     self._last_click = perf_counter()
-            if jar.center[1] > HEIGHT:
+
+            if jar.center[1] > HEIGHT and not jar.broken:
                 self.smash(jar)
                 if "pickle" not in str(jar.path):
                     self.lose_life()
+
+            if jar.broken and "pickle" not in str(jar.path):
+                if jar.broken > 3 * FRAMES_PER_ANIMATION:
+                    self.jars.remove(jar)
+                    del jar
+                else:
+                    fname = str(jar.path).split("/")[-1]
+                    color = fname[:fname.index("J")]
+                    jar.path = SPRITES / f"{color}JarSmash{jar.broken//FRAMES_PER_ANIMATION}.png"
+                    jar.broken += 1
 
     def _display_elements(self):
         """Display each element every frame."""
@@ -102,17 +119,18 @@ class Level(gui.Window):
         """Destroys a specified jar"""
 
         pygame.mixer.Sound(self.smash_sound).play()
-        self.jars.pop(self.jars.index(jar))
-        del jar
         self.score_board.message = self.score
         self.score_board.show()
+        jar.broken = FRAMES_PER_ANIMATION
 
     def spawn_jars(self):
         """Generate the next jar in a random position in sync with the song."""
         while self._running:
+            n = 3
             filename = random.choices(
-                # Each color is 3x more likely than a pickle
-                ("pickle", "red", "purple", "magenta"), (1, 3, 3, 3)
+                # Each color is n times more likely than a pickle
+                ("pickle", "red", "purple", "magenta"),
+                (1, n, n, n),
             )[0]
             self.jars.append(
                 gui.Button(
