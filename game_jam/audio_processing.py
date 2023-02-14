@@ -10,7 +10,7 @@ AUDIO_CACHE = Path(__file__).parent / "audio_cache"
 def get_each_note(path):
     """Returns the time of each note in a song."""
 
-    fname = str(path).split("/")[-1]
+    fname = str(path).split("/")[-1] + ".cache"
     cfname = AUDIO_CACHE / fname
     if cfname.exists():
         with cfname.open() as file:
