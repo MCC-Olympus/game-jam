@@ -85,7 +85,7 @@ class Level(gui.Window):
             jar.move_down(self.speed)
             jar.on_update(self)
             if jar.is_pressed:
-                if self._last_click is None or perf_counter() - self._last_click > 0.2:
+                if self._last_click is None or perf_counter() - self._last_click > 0.2 and not jar.broken:
                     self.smash(jar)
                     if "pickle" in str(jar.path):
                         self.lose_life()
