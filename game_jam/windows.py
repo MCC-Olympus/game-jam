@@ -36,7 +36,7 @@ level_select.elements = {
     "Level Two": Button(SPRITES / "lvlTwoButton.png", (2*WIDTH // 5 - 100, HEIGHT//4),border_radius=0, angle=0, scale=3,on_click=lvl_two_load),
     "Level Three": Button(SPRITES / "lvlThreeButton.png", (3*WIDTH // 5 - 100, HEIGHT//4), border_radius=0, angle=0, scale=3,on_click=lvl_three_load),
     "Endless Mode": Button(SPRITES / "endlessButton.png", (4*WIDTH // 5 - 100, HEIGHT//4), angle=0, scale=3,on_click=to_menu),
-    "Back": Button(SPRITES / "exitButton.png", (WIDTH // 2 - 100, 2*HEIGHT//4), angle=0, scale=3, on_click=to_menu)
+    "Back": Button(SPRITES / "backButton.png", (WIDTH // 2 - 100, 2*HEIGHT//4), angle=0, scale=3, on_click=to_menu)
 }
 
 settings = Window(caption="JellySmash Settings", background=SPRITES/"bg.png")

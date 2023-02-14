@@ -1,11 +1,9 @@
 """Values that don't change and are used by multiple files"""
 
 from pathlib import Path
-
 import pygame
 
 NAME = "JellySmash"
-
 ASSETS = Path(__file__).parent.parent / "assets"
 SPRITES = ASSETS / "sprites"
 SOUNDS = ASSETS / "sounds"

@@ -1,18 +1,24 @@
 """Handles all the processing of audio."""
-
 import json
 from pathlib import Path
 
 
 AUDIO_CACHE = Path(__file__).parent / "audio_cache"
 
+def is_json_file_empty(file_path):
+    with open(file_path) as f:
+        data = f.read()
+        if not data:
+            return True  
+        return False
 
 def get_each_note(path):
     """Returns the time of each note in a song."""
 
     fname = str(path).split("/")[-1] + ".cache"
     cfname = AUDIO_CACHE / fname
-    if cfname.exists():
+    if not is_json_file_empty(cfname):
+
         with cfname.open() as file:
             times = json.load(file)
             return list(times)

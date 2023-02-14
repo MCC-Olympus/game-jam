@@ -18,6 +18,7 @@ class Level(gui.Window):
         super().__init__(caption)
         self.jars: list[gui.Button] = []
         self.timestamps = list(audio_processing.get_each_note(song))
+        #self.timestamps = LVL_ONE_TIMESTAMPS
         pygame.mixer.init()
         pygame.mixer.music.load(song)
         pygame.mixer.music.play()
@@ -153,4 +154,7 @@ class Level(gui.Window):
             else:
                 print("You win!")
                 self.close()
-            self.timestamps.pop()
+            try:
+                self.timestamps.pop()
+            except:
+                pass
