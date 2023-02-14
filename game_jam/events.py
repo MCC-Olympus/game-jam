@@ -40,25 +40,25 @@ def open_level_select(window: Window):
     level_select.open()
 
 
-def increase_volume(window: Window):
+def increase_song_volume(window: Window):
     """Increase the volume by 0.1, if possible."""
 
-    Defaults.volume = min(Defaults.volume + 0.1, 1)
+    Defaults.song_volume = min(Defaults.song_volume + 0.1, 1)
 
 
-def decrease_volume(window: Window):
+def decrease_song_volume(window: Window):
     """Decrease the volume by 0.1, if possible."""
 
-    Defaults.volume = max(Defaults.volume - 0.1, 0)
+    Defaults.song_volume = max(Defaults.song_volume - 0.1, 0)
 
 
-def reset_sound(window: Window):
+def reset_song_volume(window: Window):
     """Either mutes the volume or sets it to halfway, depending on how it currently is."""
 
-    if Defaults.volume == 0:
-        Defaults.volume = 0.5
+    if Defaults.song_volume == 0:
+        Defaults.song_volume = 0.5
     else:
-        Defaults.volume = 0
+        Defaults.song_volume = 0
 
 
 def to_menu(window: Window):
@@ -72,11 +72,40 @@ def to_menu(window: Window):
     menu.open()
 
 
-def update_volume(window: Window):
+
+
+def increase_effect_volume(window: Window):
+    """Increase the volume by 0.1, if possible."""
+
+    Defaults.effect_volume = min(Defaults.effect_volume + 0.1, 1)
+
+
+def decrease_effect_volume(window: Window):
+    """Decrease the volume by 0.1, if possible."""
+
+    Defaults.effect_volume = max(Defaults.effect_volume - 0.1, 0)
+
+
+def reset_effect_volume(window: Window):
+    """Either mutes the volume or sets it to halfway, depending on how it currently is."""
+
+    if Defaults.effect_volume == 0:
+        Defaults.effect_volume = 0.5
+    else:
+        Defaults.effect_volume = 0
+
+
+
+
+def update_song_volume(window: Window):
     """Updates the text of the message button."""
 
-    window.get_element("sound").message = f"Sound: {Defaults.volume * 100:.0f}"
+    window.get_element("Music").message = f"Music: {Defaults.song_volume * 100:.0f}"
 
+def update_effect_volume(window: Window):
+    """Updates the text of the message button."""
+
+    window.get_element("effects").message = f"Effect: {Defaults.effect_volume * 100:.0f}"
 
 def lvl_one_run(window: Window):
     game = Level("Game Jam Level 1", song1)

@@ -3,12 +3,12 @@
 import random
 import threading
 import time
-from time import perf_counter
-
 import audio_processing
 import gui
 import windows
+from values import Defaults
 from constants import *
+from time import perf_counter
 
 
 class Level(gui.Window):
@@ -18,10 +18,12 @@ class Level(gui.Window):
         super().__init__(caption)
         self.jars: list[gui.Button] = []
         self.timestamps = list(audio_processing.get_each_note(song))
+        pygame.mixer.init()
         pygame.mixer.music.load(song)
         pygame.mixer.music.play()
-        self.smash_sound = SOUNDS / "smashing_glass.wav"
+        pygame.mixer.music.set_volume(Defaults.song_volume)
 
+        self.smash_sound = SOUNDS / "smashing_glass.wav"
         self.start = time.perf_counter()
         self.speed = speed
         self.score = 0
@@ -50,6 +52,9 @@ class Level(gui.Window):
         self._thread.start()
 
     def close(self):
+        windows.level_one.close()
+        windows.level_two.close()
+        windows.level_three.close()
         self._running = False
         pygame.mixer.music.stop()
         super().close()
@@ -118,7 +123,9 @@ class Level(gui.Window):
     def smash(self, jar: gui.Button):
         """Destroys a specified jar"""
 
-        pygame.mixer.Sound(self.smash_sound).play()
+        smash_sound = pygame.mixer.Sound(self.smash_sound)
+        smash_sound.set_volume(Defaults.effect_volume)
+        smash_sound.play()
         self.score_board.message = self.score
         self.score_board.show()
         jar.broken = FRAMES_PER_ANIMATION
