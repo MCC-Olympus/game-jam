@@ -92,7 +92,7 @@ class Level(gui.Window):
                 if "pickle" not in str(jar.path):
                     self.lose_life()
 
-            if jar.broken and "pickle" not in str(jar.path):
+            if jar.broken:
                 if jar.broken > 3 * FRAMES_PER_ANIMATION:
                     self.jars.remove(jar)
                     del jar
