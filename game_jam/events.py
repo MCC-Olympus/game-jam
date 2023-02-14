@@ -8,8 +8,8 @@ import pygame
 
 
 song1 = SOUNDS / "ode-to-joy.wav"
-song2 = SOUNDS / "rushE.mp3"
-song3 = SOUNDS / "gamemusic-6082.mp3"
+song2 = SOUNDS / "rushE.wav"
+song3 = SOUNDS / "gamemusic-6082.wav"
 
 
 def exit_game(window: Window) -> None:
