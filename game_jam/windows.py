@@ -22,6 +22,7 @@ def lvl_three_load(window: Window):
     window.close()
     level_three.open()
 
+
 menu = Window(caption="JellySmash Menu", background=SPRITES/"sbg.png")
 menu.elements = {
     "open": Button(SPRITES / "startButton.png",(WIDTH // 2 - 100, 100),scale=2, on_click=open_level_select),
@@ -48,10 +49,10 @@ settings.elements = {
 
 level_one = Window("Level One screen",score=0)
 level_one.elements = {
-    "Belt One": Button(SPRITES / "belt.png",(29*WIDTH // 103 , 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_click=do_nothing),
-    "Belt Two": Button(SPRITES / "belt.png",(38*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_click=do_nothing),
-    "Belt Three": Button(SPRITES / "belt.png",(47*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_click=do_nothing),
-    "Belt Four": Button(SPRITES / "belt.png",(56*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_click=do_nothing),
+    "Belt One": Button(SPRITES / "belt.png",(29*WIDTH // 103 , 0),0,scale=(HEIGHT/get_sprite_height("belt.png"))),
+    "Belt Two": Button(SPRITES / "belt.png",(38*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png"))),
+    "Belt Three": Button(SPRITES / "belt.png",(47*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png"))),
+    "Belt Four": Button(SPRITES / "belt.png",(56*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png"))),
     "Belt Five": Button(SPRITES / "belt.png",(65*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_update=lvl_one_run),
 }
 
