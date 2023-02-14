@@ -16,6 +16,7 @@ HEIGHT = pygame.display.Info().current_h
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.HWSURFACE)
 
 FPS = 60
+FRAMES_PER_ANIMATION = 5
 
 # Type hints
 Coordinate = tuple[int, int]
