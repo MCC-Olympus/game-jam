@@ -11,7 +11,6 @@ song1 = SOUNDS / "ode-to-joy.wav"
 song2 = SOUNDS / "rushE.wav"
 song3 = SOUNDS / "gamemusic-6082.wav"
 
-
 def exit_game(window: Window) -> None:
     """Closes the game and thanks the player."""
 
@@ -72,8 +71,6 @@ def to_menu(window: Window):
     menu.open()
 
 
-
-
 def increase_effect_volume(window: Window):
     """Increase the volume by 0.1, if possible."""
 
@@ -95,17 +92,17 @@ def reset_effect_volume(window: Window):
         Defaults.effect_volume = 0
 
 
-
-
 def update_song_volume(window: Window):
     """Updates the text of the message button."""
 
     window.get_element("Music").message = f"Music: {Defaults.song_volume * 100:.0f}"
 
+
 def update_effect_volume(window: Window):
     """Updates the text of the message button."""
 
     window.get_element("effects").message = f"Effect: {Defaults.effect_volume * 100:.0f}"
+
 
 def lvl_one_run(window: Window):
     game = Level("Game Jam Level 1", song1)
@@ -120,7 +117,3 @@ def lvl_two_run(window: Window):
 def lvl_three_run(window: Window):
     game = Level("Game Jam Level 3", song3, speed=7)
     game.open()
-
-
-def do_nothing(window: Window):
-    pass

@@ -18,7 +18,6 @@ class Level(gui.Window):
         super().__init__(caption)
         self.jars: list[gui.Button] = []
         self.timestamps = list(audio_processing.get_each_note(song))
-        #self.timestamps = LVL_ONE_TIMESTAMPS
         pygame.mixer.init()
         pygame.mixer.music.load(song)
         pygame.mixer.music.play()
@@ -28,11 +27,12 @@ class Level(gui.Window):
         self.start = time.perf_counter()
         self.speed = speed
         self.score = 0
-
+        self.paused = False
+        self.pauseButton = gui.Button(SPRITES / "pauseButton.png", (1080 * WIDTH // 1336, 598 * HEIGHT // 768), scale=2.5)
         self.lives = [
-            gui.Button(SPRITES / "redHeart.png", (38*WIDTH // 1336, 65*HEIGHT // 768), scale=3),
-            gui.Button(SPRITES / "redHeart.png", (143*WIDTH // 1336, 65*HEIGHT // 768), scale=3),
-            gui.Button(SPRITES / "redHeart.png", (250*WIDTH // 1336, 65*HEIGHT // 768), scale=3),
+            gui.Button(SPRITES / "redHeart.png", (38*WIDTH // 1336, 65*HEIGHT // 768), scale= 3),
+            gui.Button(SPRITES / "redHeart.png", (143*WIDTH // 1336, 65*HEIGHT // 768), scale= 3),
+            gui.Button(SPRITES / "redHeart.png", (250*WIDTH // 1336, 65*HEIGHT // 768), scale= 3),
         ]
         self.score = 0
 
@@ -52,14 +52,29 @@ class Level(gui.Window):
         self._thread = threading.Thread(target=self.spawn_jars)
         self._thread.start()
 
-    def close(self):
+    def pause(self):
+        pygame.mixer.music.pause()
+        self.paused = True
+        time.sleep(0.2)
+
+    def unpause(self):
+        pygame.mixer.music.unpause()
+        self.paused = False
+        self._thread = threading.Thread(target=self.spawn_jars)
+        self._thread.start()
+        time.sleep(0.2)
+
+    def close(self, message):
+        windows.game_over.elements["message"].message = message
+        windows.game_over.elements["Score"].message = f"Score: {self.score}"
         windows.level_one.close()
         windows.level_two.close()
         windows.level_three.close()
         self._running = False
         pygame.mixer.music.stop()
         super().close()
-        windows.level_select.open()
+        windows.game_over.open()
+        Level.close()
 
     def lose_life(self):
         """Remove a heart anytime a jar is lost"""
@@ -67,50 +82,55 @@ class Level(gui.Window):
         if len(self.lives) > 1:
             self.lives.pop()
         else:
-            print("Game over")
-            self._running = False
-            pygame.mixer.music.stop()
-            self.close()
+            self.close("You Lost")
 
     def _update_elements(self):
         """Updates each element every frame."""
-        for element in self.elements.values():
-            element.on_update(self)
-            if element.is_pressed:
-                if self._last_click is None or perf_counter() - self._last_click > 0.2:
-                    element.on_click(self)
-                    self._last_click = perf_counter()
+        if not self.paused:
+            if self.pauseButton.is_pressed:
+                if self._running:
+                    self.pause()
+            for element in self.elements.values():
+                element.on_update(self)
+                if element.is_pressed:
+                    if self._last_click is None or perf_counter() - self._last_click > 0.2:
+                        element.on_click(self)
+                        self._last_click = perf_counter()
 
-        for jar in self.jars:
-            jar.move_down(self.speed)
-            jar.on_update(self)
-            if jar.is_pressed:
-                if self._last_click is None or perf_counter() - self._last_click > 0.2 and not jar.broken:
+            for jar in self.jars:
+                jar.move_down(self.speed)
+                jar.on_update(self)
+                if jar.is_pressed:
+                    if self._last_click is None or perf_counter() - self._last_click > 0.2 and not jar.broken:
+                        self.smash(jar)
+                        if "pickle" in str(jar.path):
+                            self.lose_life()
+                        else:
+                            self.score += 100
+                        self._last_click = perf_counter()
+
+                if jar.center[1] > HEIGHT and not jar.broken:
                     self.smash(jar)
-                    if "pickle" in str(jar.path):
+                    if "pickle" not in str(jar.path):
                         self.lose_life()
+
+                if jar.broken:
+                    if jar.broken > 3 * FRAMES_PER_ANIMATION:
+                        self.jars.remove(jar)
+                        del jar
                     else:
-                        self.score += 100
-                    self._last_click = perf_counter()
-
-            if jar.center[1] > HEIGHT and not jar.broken:
-                self.smash(jar)
-                if "pickle" not in str(jar.path):
-                    self.lose_life()
-
-            if jar.broken:
-                if jar.broken > 3 * FRAMES_PER_ANIMATION:
-                    self.jars.remove(jar)
-                    del jar
-                else:
-                    fname = str(jar.path).split("/")[-1]
-                    color = fname[:fname.index("J")]
-                    jar.path = SPRITES / f"{color}JarSmash{jar.broken//FRAMES_PER_ANIMATION}.png"
-                    jar.broken += 1
+                        fname = str(jar.path).split("/")[-1]
+                        color = fname[:fname.index("J")]
+                        jar.path = SPRITES / f"{color}JarSmash{jar.broken//FRAMES_PER_ANIMATION}.png"
+                        jar.broken += 1
+        else:
+            if self.pauseButton.is_pressed:
+                self.unpause()
 
     def _display_elements(self):
         """Display each element every frame."""
         SCREEN.blit(self._background, (0, 0))
+        self.pauseButton.show()
         self.score_board.show()
         for element in (
             list(self.elements.values())
@@ -133,7 +153,7 @@ class Level(gui.Window):
 
     def spawn_jars(self):
         """Generate the next jar in a random position in sync with the song."""
-        while self._running:
+        while self._running and not self.paused:
             n = 3
             filename = random.choices(
                 # Each color is n times more likely than a pickle
@@ -152,8 +172,7 @@ class Level(gui.Window):
             elif notes == 1:
                 time.sleep(self.timestamps[0])
             else:
-                print("You win!")
-                self.close()
+                self.close("Congradulations! You won")
             try:
                 self.timestamps.pop()
             except:

@@ -4,6 +4,7 @@ from events import *
 from gui import *
 from values import Defaults
 from constants import *
+from gameplay import Level
 
 song_volume = Defaults.song_volume
 effect_volume = Defaults.effect_volume
@@ -69,4 +70,11 @@ level_two.elements = {
 level_three = Window("Level Three screen")
 level_three.elements = {
     "Belt Five": Button(SPRITES / "belt.png",(65*WIDTH // 103, 0),0,scale=(HEIGHT/get_sprite_height("belt.png")),on_update=lvl_three_run),
+}
+
+game_over = Window("Game over screen",background=SPRITES/"bg.png")
+game_over.elements = {
+    "message": TextButton(message="Congragulations you won!", position=(WIDTH // 2 - 250, HEIGHT // 6, 500, 100,), border_radius=5, font_size=75),
+    "Score": TextButton(message="0", position=(WIDTH // 2 - 100, 2 * HEIGHT // 6, 200, 50)), 
+    "Back": Button(SPRITES / "exitButton.png", (WIDTH // 2 - 100, 4 * HEIGHT // 6), angle=0, scale=3, on_click=open_level_select)
 }

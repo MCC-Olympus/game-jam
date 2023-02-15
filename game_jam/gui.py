@@ -19,6 +19,13 @@ def get_sprite_height(sprite="belt.png"):
     sprite.rect = sprite.image.get_rect()
     return sprite.rect.height
 
+def get_sprite_width(sprite="belt.png"):
+    sprite_image = pygame.image.load(SPRITES / sprite)
+    sprite = pygame.sprite.Sprite()
+    sprite.image = sprite_image
+    sprite.rect = sprite.image.get_rect()
+    return sprite.rect.width
+
 
 class Window:
     """Base class for creating all GUI windows."""
@@ -228,7 +235,7 @@ class Button(Element):
         self,
         path: Path,
         top_left: Coordinate,
-        border_radius=50,
+        border_radius=5,
         angle=0,
         scale=2.5,
         on_update: FunctionType = None,
@@ -254,6 +261,20 @@ class Button(Element):
         )
         if on_click is not None:
             self.on_click = on_click
+
+    def get_button_height(self):
+        sprite_image = pygame.image.load(SPRITES / self.path)
+        sprite = pygame.sprite.Sprite()
+        sprite.image = sprite_image
+        sprite.rect = sprite.image.get_rect()
+        return sprite.rect.height
+    
+    def get_button_width(self):
+        sprite_image = pygame.image.load(SPRITES / self.path)
+        sprite = pygame.sprite.Sprite()
+        sprite.image = sprite_image
+        sprite.rect = sprite.image.get_rect()
+        return sprite.rect.width
 
     def show(self):
         image = pygame.transform.rotate(self.sprite, self.angle)
