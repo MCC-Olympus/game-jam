@@ -12,7 +12,6 @@ def get_each_note(path):
     fname = str(path).split("/")[-1] + ".cache"
     cfname = AUDIO_CACHE / fname
     if cfname.exists():
-        print(cfname)
         with cfname.open() as file:
             times = json.load(file)
             return list(times)
