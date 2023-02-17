@@ -1,15 +1,11 @@
 """Classes and constants for creating the graphical user interface."""
 
-import sys
 import time
 from time import perf_counter
-from types import FunctionType
-
-from constants import *
 
 import pygame
 
-pygame.init()
+from .constants import *
 
 
 def get_sprite_height(sprite="belt.png"):
@@ -18,6 +14,7 @@ def get_sprite_height(sprite="belt.png"):
     sprite.image = sprite_image
     sprite.rect = sprite.image.get_rect()
     return sprite.rect.height
+
 
 def get_sprite_width(sprite="belt.png"):
     sprite_image = pygame.image.load(SPRITES / sprite)
@@ -30,66 +27,37 @@ def get_sprite_width(sprite="belt.png"):
 class Window:
     """Base class for creating all GUI windows."""
 
-    def __init__(
-        self,
-        caption: str = NAME,
-        background=SPRITES / "GameBackground.png",
-        score=0,
-    ):
-        """
-        :param caption: Sets the title for the window
-        """
-        pygame.display.set_caption(caption)
-        self.score = score
+    def __init__(self, background, elements):
+        """ """
+        if background is None:
+            background = SPRITES / "sbg.png"
+        if elements is None:
+            elements = {}
+
         self._background = pygame.transform.scale(
             pygame.image.load(background).convert(),
             (WIDTH, HEIGHT),
         )
-        self._clock = pygame.time.Clock()
-        self._running = False
+
+        self.running = True
         self._last_click = None
+        self.elements = elements
 
-        self.elements: dict[Element] = {}
-
-    def _update_elements(self):
+    def update_elements(self, game):
         """Updates each element every frame."""
-        for element in self.elements.values():
-            element.on_update(self)
+        for name, element in self.elements.items():
+            element.on_update()
             if element.is_pressed:
                 if self._last_click is None or perf_counter() - self._last_click > 0.2:
-                    element.on_click(self)
+                    element.on_click()
                     self._last_click = time.perf_counter()
 
-    def _display_elements(self):
+    def display_elements(self):
         """Display each element every frame."""
         SCREEN.blit(self._background, (0, 0))
         for element in self.elements.values():
             element.show()
         pygame.display.update()
-
-    def _loop(self):
-        """Determines what the window does each frame and when the window closes."""
-        while self._running:
-            self._clock.tick(FPS)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    print("Thanks for playing!")
-                    pygame.quit()
-                    sys.exit()
-
-            self._on_update()
-            self._update_elements()
-            self._display_elements()
-
-    def open(self):
-        """Starts the window."""
-        self._running = True
-        self._loop()
-
-    def close(self):
-        """Stop the window.."""
-        self._running = False
 
     def get_element(self, name: str) -> "Element":
         """
@@ -99,7 +67,7 @@ class Window:
         """
         return self.elements[name]
 
-    def _on_update(self):
+    def on_update(self):
         """Can be redefined, called each frame."""
 
 
@@ -107,7 +75,7 @@ class Element:
     """The base UI object from which all others are made from."""
 
     def __init__(
-        self, position: Rect, border_radius=50, on_update: FunctionType = None
+        self, position: Rect, border_radius=50, on_update: Function = None
     ):
         """
         :param position: The and y of the top left and the width and height
@@ -151,8 +119,7 @@ class Element:
         """The center of the element."""
         return self._rect.center
 
-    @staticmethod
-    def on_update(window: Window):
+    def on_update(self):
         """Called every frame."""
 
 
@@ -166,7 +133,7 @@ class Text(Element):
         color: RGB = (255, 255, 255),
         border_radius=50,
         font_size=30,
-        on_update: FunctionType = None,
+        on_update: Function = None,
     ):
         """
         :param message: The words that the element will show
@@ -184,7 +151,7 @@ class Text(Element):
 
     def show(self):
         pygame.draw.rect(
-            SCREEN, (183,101,59), self._rect, border_radius=self._border_radius
+            SCREEN, (183, 101, 59), self._rect, border_radius=self._border_radius
         )
         font = pygame.font.get_default_font()
         text = pygame.font.Font(font, self._font_size).render(
@@ -207,8 +174,8 @@ class TextButton(Text):
         color: RGB = (0, 0, 0),
         border_radius=50,
         font_size=30,
-        on_update: FunctionType = None,
-        on_click: FunctionType = None,
+        on_update: Function = None,
+        on_click: Function = None,
     ):
         """
         :param message: The words that the element will show
@@ -238,8 +205,8 @@ class Button(Element):
         border_radius=5,
         angle=0,
         scale=2.5,
-        on_update: FunctionType = None,
-        on_click: FunctionType = None,
+        on_update: Function = None,
+        on_click: Function = None,
     ):
         """
         :param path: The file path to the image of the button
@@ -268,7 +235,7 @@ class Button(Element):
         sprite.image = sprite_image
         sprite.rect = sprite.image.get_rect()
         return sprite.rect.height
-    
+
     def get_button_width(self):
         sprite_image = pygame.image.load(SPRITES / self.path)
         sprite = pygame.sprite.Sprite()

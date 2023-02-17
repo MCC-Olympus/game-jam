@@ -1,10 +1,15 @@
 """Values that don't change and are used by multiple files"""
 
 from pathlib import Path
+from typing import Callable
+
 import pygame
 
 NAME = "JellySmash"
-ASSETS = Path(__file__).parent.parent / "assets"
+
+GAME_JAM = Path(__file__).parent
+ROOT = GAME_JAM.parent
+ASSETS = ROOT / "assets"
 SPRITES = ASSETS / "sprites"
 SOUNDS = ASSETS / "sounds"
 
@@ -20,3 +25,4 @@ FRAMES_PER_ANIMATION = 5
 Coordinate = tuple[int, int]
 RGB = tuple[int, int, int]
 Rect = tuple[int, int, int, int]
+Function = Callable[[], None]

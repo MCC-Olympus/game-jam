@@ -1,119 +1,141 @@
 """Events that are triggered for a specific object every frame."""
 
-from gameplay import Level
-from gui import *
-from values import Defaults
-from constants import *
+import json
+
 import pygame
 
+from .constants import SOUNDS, GAME_JAM, Function
+from .gui import Window, Element
 
-song1 = SOUNDS / "ode-to-joy.wav"
-song2 = SOUNDS / "rushE.wav"
-song3 = SOUNDS / "gamemusic-6082.wav"
 
-def exit_game(window: Window) -> None:
+SETTINGS = GAME_JAM / "settings.json"
+
+
+def get_window(game, window_name) -> Window:
+    """
+    Gives a Window object from the parent Game object.
+
+    :param game: The Game object that contains the window.
+    :param window_name: The name of the desired window.
+    """
+
+    return game.get_window(window_name)
+
+
+def get_element(game, window_name, element_name) -> Element:
+    """
+    Returns an Element object from its parent objects.
+
+    :param game: The game object the element is in.
+    :param window_name: The name of the window in the game object that holds the element.
+    :param element_name: The name of the element.
+    """
+
+    return game.get_window(window_name).get_element(element_name)
+
+
+def open_window(game, name: str) -> Function:
+    """
+    Open a specified game window.
+
+    :param game: The game object that holds the window.
+    :param name: The name of the window, specified as a key in the dictionary `game.windows`.
+    """
+
+    def inner():
+        pygame.time.wait(200)
+        game.open(name)
+
+    return inner
+
+
+def get_settings() -> dict[str:float]:
+    """
+    Gives a dictionary of the settings file.
+    """
+
+    with SETTINGS.open() as file:
+        data = json.load(file)
+    return data
+
+
+def get_value(key: str) -> float:
+    """
+    Get the specified key from the settings file.
+
+    :param key: The setting to retrieve the value from.
+    """
+
+    return get_settings().get(key)
+
+
+def set_setting(key: str, value: float) -> None:
+    """
+    Set the given setting to be a new value.
+
+    :param key: The setting to be changed.
+    :param value: The new value of the setting.
+    """
+
+    if value < 0:
+        value = 0
+    elif value > 1:
+        value = 1
+
+    data = get_settings()
+    data[key] = value
+    with SETTINGS.open("w") as file:
+        json.dump(data, file)
+
+
+def exit_game(game) -> Function:
     """Closes the game and thanks the player."""
 
-    print("Thanks for playing!")
-    pygame.quit()
-    sys.exit()
+    def inner():
+        game.exit()
+
+    return inner
 
 
-def open_settings(window: Window):
-    """Close the current window and open the settings menu."""
-
-    window.close()
-    pygame.time.wait(200)
-
-    from windows import settings
-
-    settings.open()
-
-
-def open_level_select(window: Window):
-    window.close()
-    pygame.time.wait(200)
-
-    from windows import level_select
-
-    level_select.open()
-
-
-def increase_song_volume(window: Window):
+def increase_volume(volume_type: str) -> Function:
     """Increase the volume by 0.1, if possible."""
 
-    Defaults.song_volume = min(Defaults.song_volume + 0.1, 1)
+    def inner():
+        key = f"{volume_type} Volume"
+        old_volume = get_settings().get(key)
+        new_volume = min(old_volume + 0.1, 1)
+        set_setting(key, new_volume)
+    return inner
 
 
-def decrease_song_volume(window: Window):
+def decrease_volume(volume_type: str) -> Function:
     """Decrease the volume by 0.1, if possible."""
 
-    Defaults.song_volume = max(Defaults.song_volume - 0.1, 0)
+    def inner():
+        key = f"{volume_type} Volume"
+        old_volume = get_settings().get(key)
+        new_volume = min(old_volume - 0.1, 1)
+        set_setting(key, new_volume)
+    return inner
 
 
-def reset_song_volume(window: Window):
+def reset_volume(volume_type: str) -> Function:
     """Either mutes the volume or sets it to halfway, depending on how it currently is."""
 
-    if Defaults.song_volume == 0:
-        Defaults.song_volume = 0.5
-    else:
-        Defaults.song_volume = 0
+    def inner():
+        key = f"{volume_type} Volume"
+        old_volume = get_settings().get(key)
+        new_volume = 0
+        if old_volume == 0:
+            new_volume = 0.5
+        set_setting(key, new_volume)
+    return inner
 
 
-def to_menu(window: Window):
-    """Close the current window and open the main menu."""
+def update_volume(game, window_name: str, volume_type: str) -> Function:
+    def inner():
+        key = f"{volume_type} Volume"
+        elem = get_element(game, window_name, key)
+        elem.message = f"Music: {get_value(key) * 100:.0f}"
 
-    window.close()
-    pygame.time.wait(200)
-
-    from windows import menu
-
-    menu.open()
-
-
-def increase_effect_volume(window: Window):
-    """Increase the volume by 0.1, if possible."""
-
-    Defaults.effect_volume = min(Defaults.effect_volume + 0.1, 1)
-
-
-def decrease_effect_volume(window: Window):
-    """Decrease the volume by 0.1, if possible."""
-
-    Defaults.effect_volume = max(Defaults.effect_volume - 0.1, 0)
-
-
-def reset_effect_volume(window: Window):
-    """Either mutes the volume or sets it to halfway, depending on how it currently is."""
-
-    if Defaults.effect_volume == 0:
-        Defaults.effect_volume = 0.5
-    else:
-        Defaults.effect_volume = 0
-
-
-def update_song_volume(window: Window):
-    """Updates the text of the message button."""
-
-    window.get_element("Music").message = f"Music: {Defaults.song_volume * 100:.0f}"
-
-
-def update_effect_volume(window: Window):
-    """Updates the text of the message button."""
-
-    window.get_element("effects").message = f"Effect: {Defaults.effect_volume * 100:.0f}"
-
-
-def lvl_one_run(window: Window):
-    game = Level("Game Jam Level 1", song1)
-    game.open()
-
-
-def lvl_two_run(window: Window):
-    game = Level("Game Jam Level 2", song2, speed=6)
-    game.open()
-
-
-def lvl_three_run(window: Window):
-    game = Level("Game Jam Level 3", song3, speed=7)
-    game.open()
+    return inner
