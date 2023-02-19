@@ -15,11 +15,13 @@ from game_jam.events import (
     update_volume,
     reset_volume,
 )
-from game_jam.gui import Window, Button, TextButton, get_sprite_height
 from game_jam.gameplay import Level
+from game_jam.gui import Window, Button, TextButton
 
 
 class Game:
+    """The grouping class for specifying the windows and the running loop."""
+
     def __init__(self):
         self.windows = {}
         self.running_window = None
@@ -35,9 +37,7 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    print("Thanks for playing!")
-                    pygame.quit()
-                    sys.exit()
+                    self.exit()
 
             window.on_update()
             window.update_elements(self)
@@ -46,9 +46,21 @@ class Game:
             await asyncio.sleep(0)
 
     def get_window(self, name) -> Window:
+        """
+        Retrieve the window object with the given name.
+
+        :param name: The name of the window.
+        :returns: The desired Window object.
+        """
         return self.windows.get(name)
 
-    def open(self, name):
+    def open(self, name) -> None:
+        """
+        Sets a new window as the window to be displayed and updated.
+
+        :param name: The name of the window to display.
+        """
+
         self.running_window = name
         pygame.display.set_caption(f"{NAME} | {name}")
 
@@ -57,13 +69,21 @@ class Game:
             window.load()
 
     @staticmethod
-    def exit():
+    def exit() -> None:
+        """
+        End the game.
+        """
+
         print("Thanks for playing!")
         pygame.quit()
         sys.exit()
 
 
 my_game = Game()
+
+# The entire gui is defined in this dictionary. Each key is the name of the element, and the
+# value is an instance of the Window class (or Level, since it inherits from Window). Each Window
+# is made up of Elements, defined as another dictionary.
 my_game.windows = {
     "Menu": Window(
         SPRITES / "sbg.png",
@@ -95,7 +115,6 @@ my_game.windows = {
                 SPRITES / "lvlOneButton.png",
                 (WIDTH // 5 - 100, HEIGHT // 4),
                 border_radius=0,
-                angle=0,
                 scale=3,
                 on_click=open_window(my_game, "Level One"),
             ),
@@ -103,7 +122,6 @@ my_game.windows = {
                 SPRITES / "lvlTwoButton.png",
                 (2 * WIDTH // 5 - 100, HEIGHT // 4),
                 border_radius=0,
-                angle=0,
                 scale=3,
                 on_click=open_window(my_game, "Level Two"),
             ),
@@ -111,21 +129,18 @@ my_game.windows = {
                 SPRITES / "lvlThreeButton.png",
                 (3 * WIDTH // 5 - 100, HEIGHT // 4),
                 border_radius=0,
-                angle=0,
                 scale=3,
                 on_click=open_window(my_game, "Level Three"),
             ),
             "Endless Mode": Button(
                 SPRITES / "endlessButton.png",
                 (4 * WIDTH // 5 - 100, HEIGHT // 4),
-                angle=0,
                 scale=3,
                 on_click=open_window(my_game, "Menu"),
             ),
             "Back": Button(
                 SPRITES / "backButton.png",
                 (WIDTH // 2 - 100, 2 * HEIGHT // 4),
-                angle=0,
                 scale=3,
                 on_click=open_window(my_game, "Menu"),
             ),
@@ -218,7 +233,6 @@ my_game.windows = {
             "Back": Button(
                 SPRITES / "exitButton.png",
                 (WIDTH // 2 - 100, 4 * HEIGHT // 6),
-                angle=0,
                 scale=3,
                 on_click=open_window(my_game, "Level Selector"),
             ),

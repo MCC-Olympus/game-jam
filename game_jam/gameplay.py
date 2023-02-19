@@ -1,41 +1,60 @@
 """Classes and elements that will appear during the gameplay itself."""
+
 import asyncio
 import random
-import threading
-import time
 from time import perf_counter
 
+import pygame
+
 from . import audio_processing
-from . import gui
-from .constants import *
-from .events import get_value, open_window
-from .gui import Button, get_sprite_height
+from .constants import WIDTH, HEIGHT, SOUNDS, SPRITES, SCREEN
+from .events import get_value, toggle_paused, update_scoreboard, update_jar, smash_jar
+from .gui import Window, Button, get_sprite_height, Text
 
 
-class Level(gui.Window):
+class Level(Window):
     """The class for making individual levels."""
 
     def __init__(self, game, song, speed=5):
+        """
+        :param game: The Game object that this level belongs to.
+        :param song: The path to the song that should play in the background.
+        :param speed: How many pixels per second each jar should fall at.
+        """
+
         super().__init__(None, None)
         self.game = game
         self.song = song
-        self.task = None
         self.speed = speed
 
-        self.jars: list[gui.Button] = []
-        self.timestamps = list(audio_processing.get_each_note(song))
-        self.smash_sound = SOUNDS / "smashing_glass.ogg"
-        self.start = time.perf_counter()
-        self.score = 0
-        self.paused = False
-        self.running = True
+        self.score = None
+        self.running = None
         self._last_click = None
-        self.pauseButton = gui.Button(
-            SPRITES / "pauseButton.png",
-            (1080 * WIDTH // 1336, 598 * HEIGHT // 768),
-            scale=2.5,
-        )
+        self._task = None
+        self.timestamps = None
+
+        self.smash_sound = SOUNDS / "smashing_glass.ogg"
+
         self.elements = {
+            "Pause Button": Button(
+                SPRITES / "pauseButton.png",
+                (1080 * WIDTH // 1336, 598 * HEIGHT // 768),
+                scale=2.5,
+                on_click=toggle_paused(self),
+            ),
+            "Lives": [],
+            "Jars": [],
+            "Score board": Text(
+                message=str(self.score),
+                position=(
+                    997 * WIDTH // 1366,
+                    201 * HEIGHT // 768,
+                    355 * WIDTH // 1366,
+                    100 * HEIGHT // 768,
+                ),
+                font_size=75,
+                on_update=update_scoreboard(self),
+            ),
             "Belt One": Button(
                 SPRITES / "belt.png",
                 (29 * WIDTH // 103, 0),
@@ -66,40 +85,36 @@ class Level(gui.Window):
                 0,
                 scale=(HEIGHT / get_sprite_height("belt.png")),
             ),
-            "Lives": [
-                Button(
-                    SPRITES / "redHeart.png",
-                    (38 * WIDTH // 1336, 65 * HEIGHT // 768),
-                    scale=3,
-                ),
-                Button(
-                    SPRITES / "redHeart.png",
-                    (143 * WIDTH // 1336, 65 * HEIGHT // 768),
-                    scale=3,
-                ),
-                Button(
-                    SPRITES / "redHeart.png",
-                    (250 * WIDTH // 1336, 65 * HEIGHT // 768),
-                    scale=3,
-                ),
-            ],
         }
 
-        self.score_board = gui.Text(
-            message=str(self.score),
-            position=(
-                997 * WIDTH // 1366,
-                201 * HEIGHT // 768,
-                355 * WIDTH // 1366,
-                100 * HEIGHT // 768,
-            ),
-            border_radius=0,
-            font_size=75,
-        )
-        self._thread = threading.Thread(target=self.spawn_jars)
+    def load(self) -> None:
+        """Loads in a Level. Resets old progress, if there is any."""
 
-    def load(self):
-        self.__init__(self.game, self.song, self.speed)
+        self.score = 0
+        self.running = True
+        self._last_click = None
+
+        self.elements["Jars"] = []
+        self.elements["Lives"] = [
+            Button(
+                SPRITES / "redHeart.png",
+                (38 * WIDTH // 1336, 65 * HEIGHT // 768),
+                scale=3,
+            ),
+            Button(
+                SPRITES / "redHeart.png",
+                (143 * WIDTH // 1336, 65 * HEIGHT // 768),
+                scale=3,
+            ),
+            Button(
+                SPRITES / "redHeart.png",
+                (250 * WIDTH // 1336, 65 * HEIGHT // 768),
+                scale=3,
+            ),
+        ]
+
+        self.timestamps = audio_processing.get_each_note(self.song)
+
         pygame.mixer.init()
         pygame.mixer.music.load(self.song)
 
@@ -107,131 +122,102 @@ class Level(gui.Window):
         pygame.mixer.music.set_volume(volume)
 
         pygame.mixer.music.play()
-        self.running = True
-        self.task = asyncio.create_task(self.spawn_jars())
+        self._task = asyncio.create_task(self.spawn_jars())
 
-    def pause(self):
-        pygame.mixer.music.pause()
-        self.paused = True
-        time.sleep(0.2)
+    def close(self) -> None:
+        """Exit the game onto the game over screen."""
 
-    def unpause(self):
-        pygame.mixer.music.unpause()
-        self.paused = False
-        self._thread = threading.Thread(target=self.spawn_jars)
-        self._thread.start()
-        time.sleep(0.2)
-
-    def close(self):
         pygame.mixer.music.stop()
-        self.task = None
-        self.jars = []
-        self.timestamps = list(audio_processing.get_each_note(self.song))
+        self._task = None
         self.running = False
-        open_window(self.game, "Game Over")()
+        self.game.open("Game Over")
 
-    def lose_life(self):
+    def lose_life(self) -> None:
         """Remove a heart anytime a jar is lost"""
 
-        lives = self.elements.get("Lives")
+        lives: list = self.elements.get("Lives")
         if len(lives) > 1:
             lives.pop()
         else:
+            message = self.game.get_window("Game Over").get_element("message")
+            message.message = "You lose!"
+            score = self.game.get_window("Game Over").get_element("Score")
+            score.message = self.score
+
             self.close()
 
-    def update_elements(self, game):
+    def update_elements(self, game) -> None:
         """Updates each element every frame."""
-        if not self.paused:
-            if self.pauseButton.is_pressed and self.running:
-                self.pause()
-            for name, element in self.elements.items():
-                if name == "Lives":
-                    continue
-                element.on_update()
-                if element.is_pressed:
-                    if (
-                        self._last_click is None
-                        or perf_counter() - self._last_click > 0.2
-                    ):
-                        element.on_click()
-                        self._last_click = perf_counter()
 
-            for jar in self.jars:
-                jar.move_down(self.speed)
-                jar.on_update()
-                if jar.is_pressed and not jar.broken:
-                    self.smash(jar)
-                    if "pickle" in str(jar.path):
-                        self.lose_life()
-                    else:
-                        self.score += 100
+        for name, element in self.elements.items():
+            if name == "Lives":
+                continue
+            if name == "Jars":
+                continue
+            element.on_update()
+            if element.is_pressed:
+                if self._last_click is None or perf_counter() - self._last_click > 0.2:
+                    element.on_click()
+                    self._last_click = perf_counter()
 
-                if jar.center[1] > HEIGHT and not jar.broken:
-                    self.smash(jar)
-                    if "pickle" not in str(jar.path):
-                        self.lose_life()
+        if not self.running:
+            return
 
-                if jar.broken:
-                    if jar.broken > 3 * FRAMES_PER_ANIMATION:
-                        self.jars.remove(jar)
-                        del jar
-                    else:
-                        fname = str(jar.path).split("/")[-1]
-                        color = fname[: fname.index("J")]
-                        jar.path = (
-                            SPRITES
-                            / f"{color}JarSmash{jar.broken // FRAMES_PER_ANIMATION}.png"
-                        )
-                        jar.broken += 1
-        else:
-            if self.pauseButton.is_pressed:
-                self.unpause()
+        jars: list = self.elements.get("Jars")
+        for jar in jars:
+            jar.on_update()
+            if jar.is_pressed:
+                jar.on_click()
 
     def display_elements(self):
         """Display each element every frame."""
+
         SCREEN.blit(self._background, (0, 0))
-        self.pauseButton.show()
-        self.score_board.show()
-        elements = [
-            element for name, element in self.elements.items() if name != "Lives"
-        ] + self.elements.get("Lives")
-        for element in elements + self.jars:
+
+        for element in (
+            [
+                element
+                for name, element in self.elements.items()
+                if name not in ("Lives", "Jars")
+            ]
+            + self.elements.get("Lives")
+            + self.elements.get("Jars")
+        ):
             element.show()
+
         pygame.display.update()
-
-    def smash(self, jar: gui.Button):
-        """Destroys a specified jar"""
-
-        smash_sound = pygame.mixer.Sound(self.smash_sound)
-        volume = get_value("Effects Volume")
-        smash_sound.set_volume(volume)
-        smash_sound.play()
-        self.score_board.message = self.score
-        self.score_board.show()
-        jar.broken = FRAMES_PER_ANIMATION
 
     async def spawn_jars(self):
         """Generate the next jar in a random position in sync with the song."""
-        while self.running and not self.paused:
-            n = 3
-            filename = random.choices(
-                # Each color is n times more likely than a pickle
-                ("pickle", "red", "purple", "magenta"),
-                (1, n, n, n),
-            )[0]
-            self.jars.append(
-                gui.Button(
+
+        jars: list = self.elements.get("Jars")
+
+        while True:
+            if self.running:
+                n = 3
+                filename = random.choices(
+                    # Each color is n times more likely than a pickle
+                    ("pickle", "red", "purple", "magenta"),
+                    (1, n, n, n),
+                )[0]
+                jar = Button(
                     SPRITES / f"{filename}Jar.png",
                     ((30 + (random.randint(0, 4) * 9)) * WIDTH // 103, 0),
                 )
-            )
-            notes = len(self.timestamps)
-            sleep_time = 0
-            if notes >= 2:
-                sleep_time = self.timestamps[1] - self.timestamps[0]
-            elif notes == 1:
-                sleep_time = self.timestamps[0]
+
+                jar.on_update = update_jar(self, jar, self.speed)
+                jar.on_click = smash_jar(self, jar)
+                jars.append(jar)
+
+                notes = len(self.timestamps)
+                sleep_time = 0
+                if notes >= 2:
+                    sleep_time = self.timestamps[1] - self.timestamps[0]
+                elif notes == 1:
+                    sleep_time = self.timestamps[0]
+                else:
+                    self.close()
+                await asyncio.sleep(sleep_time)
+                self.timestamps.pop()
             else:
-                self.close()
-            await asyncio.sleep(sleep_time)
-            self.timestamps.pop()
+                await asyncio.sleep(0)
