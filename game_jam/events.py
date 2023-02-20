@@ -140,7 +140,7 @@ def update_volume(game, window_name: str, volume_type: str) -> Function:
     def inner():
         key = f"{volume_type} Volume"
         elem = get_element(game, window_name, key)
-        elem.message = f"Music: {get_value(key) * 100:.0f}"
+        elem.message = f"{volume_type}: {get_value(key) * 100:.0f}"
 
     return inner
 
