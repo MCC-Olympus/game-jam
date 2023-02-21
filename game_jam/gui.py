@@ -30,7 +30,7 @@ class Window:
     def __init__(self, background, elements):
         """ """
         if background is None:
-            background = SPRITES / "sbg.png"
+            background = SPRITES / "GameBackground.png"
         if elements is None:
             elements = {}
 

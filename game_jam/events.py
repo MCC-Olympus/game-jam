@@ -52,7 +52,7 @@ def get_settings() -> dict[str:float]:
     """
     Gives a dictionary of the settings file.
     """
-
+    
     with SETTINGS.open() as file:
         data = json.load(file)
     return data
@@ -161,7 +161,7 @@ def toggle_paused(level) -> Function:
 def update_scoreboard(level):
     def inner():
         level.get_element("Score board").message = level.score
-
+        
     return inner
 
 

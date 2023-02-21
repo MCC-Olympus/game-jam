@@ -14,6 +14,7 @@ from game_jam.events import (
     decrease_volume,
     update_volume,
     reset_volume,
+    update_scoreboard,
 )
 from game_jam.gameplay import Level
 from game_jam.gui import Window, Button, TextButton
@@ -204,12 +205,12 @@ my_game.windows = {
     "Level Two": Level(
         my_game,
         SOUNDS / "rushE.ogg",
-        speed=6,
+        speed=7,
     ),
     "Level Three": Level(
         my_game,
         SOUNDS / "gamemusic-6082.ogg",
-        speed=7,
+        speed=10,
     ),
     "Game Over": Window(
         SPRITES / "bg.png",
@@ -226,7 +227,7 @@ my_game.windows = {
                 font_size=75,
             ),
             "Score": TextButton(
-                message="0",
+                message=0,
                 position=(WIDTH // 2 - 100, 2 * HEIGHT // 6, 200, 50),
             ),
             "Back": Button(
