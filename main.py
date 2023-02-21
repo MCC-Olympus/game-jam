@@ -227,7 +227,7 @@ my_game.windows = {
                 font_size=75,
             ),
             "Score": TextButton(
-                message=0,
+                message="0",
                 position=(WIDTH // 2 - 100, 2 * HEIGHT // 6, 200, 50),
             ),
             "Back": Button(
