@@ -187,7 +187,7 @@ class TextButton(Text):
             self.on_click = on_click
 
     @staticmethod
-    def on_click(window: Window):
+    def on_click():
         """Called whenever the button is pressed"""
 
 
