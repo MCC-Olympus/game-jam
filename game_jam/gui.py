@@ -110,10 +110,6 @@ class Element:
     def on_click(self):
         """Called when an element is clicked on"""
 
-    def move_down(self, y: int):
-        """Move the element down by the specified amount."""
-        self.move(0, y)
-
     @property
     def center(self):
         """The center of the element."""
@@ -191,7 +187,7 @@ class TextButton(Text):
             self.on_click = on_click
 
     @staticmethod
-    def on_click(window: Window):
+    def on_click():
         """Called whenever the button is pressed"""
 
 
