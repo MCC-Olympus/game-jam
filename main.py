@@ -74,7 +74,6 @@ class Game:
         End the game.
         """
 
-        print("Thanks for playing!")
         pygame.quit()
         sys.exit()
 

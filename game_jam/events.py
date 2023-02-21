@@ -149,7 +149,6 @@ def toggle_paused(level) -> Function:
     """Pause or resume the game."""
 
     def inner():
-        print("pressed")
         if level.running:
             pygame.mixer.music.pause()
         else:
