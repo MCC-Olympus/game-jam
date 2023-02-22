@@ -48,7 +48,7 @@ class Level(Window):
                 message=str(self.score),
                 position=(
                     997 * WIDTH // 1366,
-                    201 * HEIGHT // 768,
+                    50 * HEIGHT // 768,
                     355 * WIDTH // 1366,
                     100 * HEIGHT // 768,
                 ),
@@ -216,8 +216,15 @@ class Level(Window):
                 elif notes == 1:
                     sleep_time = self.timestamps[0]
                 else:
+                    message = self.game.get_window("Game Over").get_element("message")
+                    message.message = "You Won"
+                    score = self.game.get_window("Game Over").get_element("Score")
+                    score.message = self.score
                     self.close()
                 await asyncio.sleep(sleep_time)
-                self.timestamps.pop()
+                try:
+                    self.timestamps.pop()
+                except IndexError:
+                    pass
             else:
                 await asyncio.sleep(0)
